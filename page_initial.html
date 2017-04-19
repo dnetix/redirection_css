@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Edición CSS de comercio</title>
 
-    <link rel="shortcut icon" href="http://local.dev/redirection/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./index_files/font-awesome.min.css">
     <link rel="stylesheet" href="./index_files/style.css">
     <link rel="stylesheet" href="./style.css">
@@ -286,7 +286,8 @@
                                     <label for="card_expiration">Fecha vencimiento</label>
                                     <input type="text" name="card_expiration" id="card_expiration"
                                            class="form-control expiration-input validation" placeholder="MM/YY"
-                                           required="required" autocomplete="off" maxlength="5" v-model="instrument.expiration">
+                                           required="required" autocomplete="off" maxlength="5"
+                                           v-model="instrument.expiration">
                                     <p class="error">La fecha de expiración es de la forma MM/YY y debe estar vigente y
                                         no ser mayor a 10 años</p>
                                     <span class="hint">Solo ingresa los números, la barra (/) es automática</span>
@@ -362,7 +363,8 @@
                                 <div class="promotions">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="card"
                                             v-on:click="selectGateway('card')">
                                         <i class="fa fa-lock"></i>
@@ -435,7 +437,8 @@
                                 <div class="promotions">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="debit"
                                             v-on:click="selectGateway('debit')">
                                         <i class="fa fa-lock"></i>
@@ -498,7 +501,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="pse"
                                             v-on:click="selectGateway('pse')">
                                         <i class="fa fa-lock"></i>
@@ -519,7 +523,8 @@
                                         podrá pagar esta referencia de pago hasta el <strong>2019-04-19
                                             08:49:42</strong></p></div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="cash"
                                             v-on:click="selectGateway('cash')">
                                         <i class="fa fa-lock"></i>
@@ -569,7 +574,8 @@
                                     </div>
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="ganapin"
                                             v-on:click="selectGateway('ganapin')">
                                         <i class="fa fa-lock"></i>
@@ -653,7 +659,8 @@
                                          class="img-responsive">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="ris"
                                             v-on:click="selectGateway('ris')">
                                         <i class="fa fa-lock"></i>
@@ -671,7 +678,8 @@
                                     <img src="./index_files/paypal_partners.png" alt="PayPal" class="img-responsive">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="paypal"
                                             v-on:click="selectGateway('paypal')">
                                         <i class="fa fa-lock"></i>
@@ -689,7 +697,8 @@
                                          class="img-responsive">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="alkosto"
                                             v-on:click="selectGateway('alkosto')">
                                         <i class="fa fa-lock"></i>
@@ -708,7 +717,8 @@
                                          class="img-responsive">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="safetypay"
                                             v-on:click="selectGateway('safetypay')">
                                         <i class="fa fa-lock"></i>
@@ -726,7 +736,8 @@
                                          class="img-responsive">
                                 </div>
                                 <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
+                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
+                                    </button>
                                     <button type="button" class="btn btn-primary btn-process" data-id="exito"
                                             v-on:click="selectGateway('exito')">
                                         <i class="fa fa-lock"></i>
@@ -740,7 +751,7 @@
 
                 <div class="cancel-payment">
                     <a class="btn btn-default btn-link"
-                       href="http://local.dev/redirection/cancel/94/be21911aedb5e968c39d9c83c6a42c84"
+                       href="https://www.placetopay.com"
                        id="cancel-button">
                         <i class="fa fa-times"></i>
                         No deseo continuar el proceso
