@@ -1,3 +1,448 @@
+!function (e, t, i) {
+    "use strict";
+    "function" == typeof define && define.amd ? define(i) : "undefined" != typeof module && module.exports ? module.exports = i() : t.exports ? t.exports = i() : t[e] = i()
+}("Fingerprint2", this, function () {
+    "use strict";
+    var e = function (t) {
+        if (!(this instanceof e)) return new e(t);
+        var i = {
+            swfContainerId: "fingerprintjs2",
+            swfPath: "flash/compiled/FontList.swf",
+            detectScreenOrientation: !0,
+            sortPluginsFor: [/palemoon/i],
+            userDefinedFonts: []
+        };
+        this.options = this.extend(t, i), this.nativeForEach = Array.prototype.forEach, this.nativeMap = Array.prototype.map
+    };
+    return e.prototype = {
+        extend: function (e, t) {
+            if (null == e) return t;
+            for (var i in e) null != e[i] && t[i] !== e[i] && (t[i] = e[i]);
+            return t
+        }, get: function (e) {
+            var t = [];
+            t = this.userAgentKey(t), t = this.languageKey(t), t = this.colorDepthKey(t), t = this.pixelRatioKey(t), t = this.hardwareConcurrencyKey(t), t = this.screenResolutionKey(t), t = this.availableScreenResolutionKey(t), t = this.timezoneOffsetKey(t), t = this.sessionStorageKey(t), t = this.localStorageKey(t), t = this.indexedDbKey(t), t = this.addBehaviorKey(t), t = this.openDatabaseKey(t), t = this.cpuClassKey(t), t = this.platformKey(t), t = this.doNotTrackKey(t), t = this.pluginsKey(t), t = this.canvasKey(t), t = this.webglKey(t), t = this.adBlockKey(t), t = this.hasLiedLanguagesKey(t), t = this.hasLiedResolutionKey(t), t = this.hasLiedOsKey(t), t = this.hasLiedBrowserKey(t), t = this.touchSupportKey(t), t = this.customEntropyFunction(t);
+            var i = this;
+            this.fontsKey(t, function (t) {
+                var a = [];
+                i.each(t, function (e) {
+                    var t = e.value;
+                    "undefined" != typeof e.value.join && (t = e.value.join(";")), a.push(t)
+                });
+                var r = i.x64hash128(a.join("~~~"), 31);
+                return e(r, t)
+            })
+        }, customEntropyFunction: function (e) {
+            return "function" == typeof this.options.customFunction && e.push({
+                key: "custom",
+                value: this.options.customFunction()
+            }), e
+        }, userAgentKey: function (e) {
+            return this.options.excludeUserAgent || e.push({key: "user_agent", value: this.getUserAgent()}), e
+        }, getUserAgent: function () {
+            return navigator.userAgent
+        }, languageKey: function (e) {
+            return this.options.excludeLanguage || e.push({
+                key: "language",
+                value: navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || ""
+            }), e
+        }, colorDepthKey: function (e) {
+            return this.options.excludeColorDepth || e.push({key: "color_depth", value: screen.colorDepth || -1}), e
+        }, pixelRatioKey: function (e) {
+            return this.options.excludePixelRatio || e.push({key: "pixel_ratio", value: this.getPixelRatio()}), e
+        }, getPixelRatio: function () {
+            return window.devicePixelRatio || ""
+        }, screenResolutionKey: function (e) {
+            return this.options.excludeScreenResolution ? e : this.getScreenResolution(e)
+        }, getScreenResolution: function (e) {
+            var t;
+            return t = this.options.detectScreenOrientation && screen.height > screen.width ? [screen.height, screen.width] : [screen.width, screen.height], "undefined" != typeof t && e.push({
+                key: "resolution",
+                value: t
+            }), e
+        }, availableScreenResolutionKey: function (e) {
+            return this.options.excludeAvailableScreenResolution ? e : this.getAvailableScreenResolution(e)
+        }, getAvailableScreenResolution: function (e) {
+            var t;
+            return screen.availWidth && screen.availHeight && (t = this.options.detectScreenOrientation ? screen.availHeight > screen.availWidth ? [screen.availHeight, screen.availWidth] : [screen.availWidth, screen.availHeight] : [screen.availHeight, screen.availWidth]), "undefined" != typeof t && e.push({
+                key: "available_resolution",
+                value: t
+            }), e
+        }, timezoneOffsetKey: function (e) {
+            return this.options.excludeTimezoneOffset || e.push({
+                key: "timezone_offset",
+                value: (new Date).getTimezoneOffset()
+            }), e
+        }, sessionStorageKey: function (e) {
+            return !this.options.excludeSessionStorage && this.hasSessionStorage() && e.push({
+                key: "session_storage",
+                value: 1
+            }), e
+        }, localStorageKey: function (e) {
+            return !this.options.excludeSessionStorage && this.hasLocalStorage() && e.push({
+                key: "local_storage",
+                value: 1
+            }), e
+        }, indexedDbKey: function (e) {
+            return !this.options.excludeIndexedDB && this.hasIndexedDB() && e.push({key: "indexed_db", value: 1}), e
+        }, addBehaviorKey: function (e) {
+            return document.body && !this.options.excludeAddBehavior && document.body.addBehavior && e.push({
+                key: "add_behavior",
+                value: 1
+            }), e
+        }, openDatabaseKey: function (e) {
+            return !this.options.excludeOpenDatabase && window.openDatabase && e.push({
+                key: "open_database",
+                value: 1
+            }), e
+        }, cpuClassKey: function (e) {
+            return this.options.excludeCpuClass || e.push({key: "cpu_class", value: this.getNavigatorCpuClass()}), e
+        }, platformKey: function (e) {
+            return this.options.excludePlatform || e.push({
+                key: "navigator_platform",
+                value: this.getNavigatorPlatform()
+            }), e
+        }, doNotTrackKey: function (e) {
+            return this.options.excludeDoNotTrack || e.push({key: "do_not_track", value: this.getDoNotTrack()}), e
+        }, canvasKey: function (e) {
+            return !this.options.excludeCanvas && this.isCanvasSupported() && e.push({
+                key: "canvas",
+                value: this.getCanvasFp()
+            }), e
+        }, webglKey: function (e) {
+            return this.options.excludeWebGL ? e : this.isWebGlSupported() ? (e.push({
+                key: "webgl",
+                value: this.getWebglFp()
+            }), e) : e
+        }, adBlockKey: function (e) {
+            return this.options.excludeAdBlock || e.push({key: "adblock", value: this.getAdBlock()}), e
+        }, hasLiedLanguagesKey: function (e) {
+            return this.options.excludeHasLiedLanguages || e.push({
+                key: "has_lied_languages",
+                value: this.getHasLiedLanguages()
+            }), e
+        }, hasLiedResolutionKey: function (e) {
+            return this.options.excludeHasLiedResolution || e.push({
+                key: "has_lied_resolution",
+                value: this.getHasLiedResolution()
+            }), e
+        }, hasLiedOsKey: function (e) {
+            return this.options.excludeHasLiedOs || e.push({key: "has_lied_os", value: this.getHasLiedOs()}), e
+        }, hasLiedBrowserKey: function (e) {
+            return this.options.excludeHasLiedBrowser || e.push({
+                key: "has_lied_browser",
+                value: this.getHasLiedBrowser()
+            }), e
+        }, fontsKey: function (e, t) {
+            return this.options.excludeJsFonts ? this.flashFontsKey(e, t) : this.jsFontsKey(e, t)
+        }, flashFontsKey: function (e, t) {
+            return this.options.excludeFlashFonts ? t(e) : this.hasSwfObjectLoaded() && this.hasMinFlashInstalled() ? "undefined" == typeof this.options.swfPath ? t(e) : void this.loadSwfAndDetectFonts(function (i) {
+                e.push({key: "swf_fonts", value: i.join(";")}), t(e)
+            }) : t(e)
+        }, jsFontsKey: function (e, t) {
+            var i = this;
+            return setTimeout(function () {
+                var a = ["monospace", "sans-serif", "serif"],
+                    r = ["Andale Mono", "Arial", "Arial Black", "Arial Hebrew", "Arial MT", "Arial Narrow", "Arial Rounded MT Bold", "Arial Unicode MS", "Bitstream Vera Sans Mono", "Book Antiqua", "Bookman Old Style", "Calibri", "Cambria", "Cambria Math", "Century", "Century Gothic", "Century Schoolbook", "Comic Sans", "Comic Sans MS", "Consolas", "Courier", "Courier New", "Garamond", "Geneva", "Georgia", "Helvetica", "Helvetica Neue", "Impact", "Lucida Bright", "Lucida Calligraphy", "Lucida Console", "Lucida Fax", "LUCIDA GRANDE", "Lucida Handwriting", "Lucida Sans", "Lucida Sans Typewriter", "Lucida Sans Unicode", "Microsoft Sans Serif", "Monaco", "Monotype Corsiva", "MS Gothic", "MS Outlook", "MS PGothic", "MS Reference Sans Serif", "MS Sans Serif", "MS Serif", "MYRIAD", "MYRIAD PRO", "Palatino", "Palatino Linotype", "Segoe Print", "Segoe Script", "Segoe UI", "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Symbol", "Tahoma", "Times", "Times New Roman", "Times New Roman PS", "Trebuchet MS", "Verdana", "Wingdings", "Wingdings 2", "Wingdings 3"],
+                    n = ["Abadi MT Condensed Light", "Academy Engraved LET", "ADOBE CASLON PRO", "Adobe Garamond", "ADOBE GARAMOND PRO", "Agency FB", "Aharoni", "Albertus Extra Bold", "Albertus Medium", "Algerian", "Amazone BT", "American Typewriter", "American Typewriter Condensed", "AmerType Md BT", "Andalus", "Angsana New", "AngsanaUPC", "Antique Olive", "Aparajita", "Apple Chancery", "Apple Color Emoji", "Apple SD Gothic Neo", "Arabic Typesetting", "ARCHER", "ARNO PRO", "Arrus BT", "Aurora Cn BT", "AvantGarde Bk BT", "AvantGarde Md BT", "AVENIR", "Ayuthaya", "Bandy", "Bangla Sangam MN", "Bank Gothic", "BankGothic Md BT", "Baskerville", "Baskerville Old Face", "Batang", "BatangChe", "Bauer Bodoni", "Bauhaus 93", "Bazooka", "Bell MT", "Bembo", "Benguiat Bk BT", "Berlin Sans FB", "Berlin Sans FB Demi", "Bernard MT Condensed", "BernhardFashion BT", "BernhardMod BT", "Big Caslon", "BinnerD", "Blackadder ITC", "BlairMdITC TT", "Bodoni 72", "Bodoni 72 Oldstyle", "Bodoni 72 Smallcaps", "Bodoni MT", "Bodoni MT Black", "Bodoni MT Condensed", "Bodoni MT Poster Compressed", "Bookshelf Symbol 7", "Boulder", "Bradley Hand", "Bradley Hand ITC", "Bremen Bd BT", "Britannic Bold", "Broadway", "Browallia New", "BrowalliaUPC", "Brush Script MT", "Californian FB", "Calisto MT", "Calligrapher", "Candara", "CaslonOpnface BT", "Castellar", "Centaur", "Cezanne", "CG Omega", "CG Times", "Chalkboard", "Chalkboard SE", "Chalkduster", "Charlesworth", "Charter Bd BT", "Charter BT", "Chaucer", "ChelthmITC Bk BT", "Chiller", "Clarendon", "Clarendon Condensed", "CloisterBlack BT", "Cochin", "Colonna MT", "Constantia", "Cooper Black", "Copperplate", "Copperplate Gothic", "Copperplate Gothic Bold", "Copperplate Gothic Light", "CopperplGoth Bd BT", "Corbel", "Cordia New", "CordiaUPC", "Cornerstone", "Coronet", "Cuckoo", "Curlz MT", "DaunPenh", "Dauphin", "David", "DB LCD Temp", "DELICIOUS", "Denmark", "DFKai-SB", "Didot", "DilleniaUPC", "DIN", "DokChampa", "Dotum", "DotumChe", "Ebrima", "Edwardian Script ITC", "Elephant", "English 111 Vivace BT", "Engravers MT", "EngraversGothic BT", "Eras Bold ITC", "Eras Demi ITC", "Eras Light ITC", "Eras Medium ITC", "EucrosiaUPC", "Euphemia", "Euphemia UCAS", "EUROSTILE", "Exotc350 Bd BT", "FangSong", "Felix Titling", "Fixedsys", "FONTIN", "Footlight MT Light", "Forte", "FrankRuehl", "Fransiscan", "Freefrm721 Blk BT", "FreesiaUPC", "Freestyle Script", "French Script MT", "FrnkGothITC Bk BT", "Fruitger", "FRUTIGER", "Futura", "Futura Bk BT", "Futura Lt BT", "Futura Md BT", "Futura ZBlk BT", "FuturaBlack BT", "Gabriola", "Galliard BT", "Gautami", "Geeza Pro", "Geometr231 BT", "Geometr231 Hv BT", "Geometr231 Lt BT", "GeoSlab 703 Lt BT", "GeoSlab 703 XBd BT", "Gigi", "Gill Sans", "Gill Sans MT", "Gill Sans MT Condensed", "Gill Sans MT Ext Condensed Bold", "Gill Sans Ultra Bold", "Gill Sans Ultra Bold Condensed", "Gisha", "Gloucester MT Extra Condensed", "GOTHAM", "GOTHAM BOLD", "Goudy Old Style", "Goudy Stout", "GoudyHandtooled BT", "GoudyOLSt BT", "Gujarati Sangam MN", "Gulim", "GulimChe", "Gungsuh", "GungsuhChe", "Gurmukhi MN", "Haettenschweiler", "Harlow Solid Italic", "Harrington", "Heather", "Heiti SC", "Heiti TC", "HELV", "Herald", "High Tower Text", "Hiragino Kaku Gothic ProN", "Hiragino Mincho ProN", "Hoefler Text", "Humanst 521 Cn BT", "Humanst521 BT", "Humanst521 Lt BT", "Imprint MT Shadow", "Incised901 Bd BT", "Incised901 BT", "Incised901 Lt BT", "INCONSOLATA", "Informal Roman", "Informal011 BT", "INTERSTATE", "IrisUPC", "Iskoola Pota", "JasmineUPC", "Jazz LET", "Jenson", "Jester", "Jokerman", "Juice ITC", "Kabel Bk BT", "Kabel Ult BT", "Kailasa", "KaiTi", "Kalinga", "Kannada Sangam MN", "Kartika", "Kaufmann Bd BT", "Kaufmann BT", "Khmer UI", "KodchiangUPC", "Kokila", "Korinna BT", "Kristen ITC", "Krungthep", "Kunstler Script", "Lao UI", "Latha", "Leelawadee", "Letter Gothic", "Levenim MT", "LilyUPC", "Lithograph", "Lithograph Light", "Long Island", "Lydian BT", "Magneto", "Maiandra GD", "Malayalam Sangam MN", "Malgun Gothic", "Mangal", "Marigold", "Marion", "Marker Felt", "Market", "Marlett", "Matisse ITC", "Matura MT Script Capitals", "Meiryo", "Meiryo UI", "Microsoft Himalaya", "Microsoft JhengHei", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Uighur", "Microsoft YaHei", "Microsoft Yi Baiti", "MingLiU", "MingLiU_HKSCS", "MingLiU_HKSCS-ExtB", "MingLiU-ExtB", "Minion", "Minion Pro", "Miriam", "Miriam Fixed", "Mistral", "Modern", "Modern No. 20", "Mona Lisa Solid ITC TT", "Mongolian Baiti", "MONO", "MoolBoran", "Mrs Eaves", "MS LineDraw", "MS Mincho", "MS PMincho", "MS Reference Specialty", "MS UI Gothic", "MT Extra", "MUSEO", "MV Boli", "Nadeem", "Narkisim", "NEVIS", "News Gothic", "News GothicMT", "NewsGoth BT", "Niagara Engraved", "Niagara Solid", "Noteworthy", "NSimSun", "Nyala", "OCR A Extended", "Old Century", "Old English Text MT", "Onyx", "Onyx BT", "OPTIMA", "Oriya Sangam MN", "OSAKA", "OzHandicraft BT", "Palace Script MT", "Papyrus", "Parchment", "Party LET", "Pegasus", "Perpetua", "Perpetua Titling MT", "PetitaBold", "Pickwick", "Plantagenet Cherokee", "Playbill", "PMingLiU", "PMingLiU-ExtB", "Poor Richard", "Poster", "PosterBodoni BT", "PRINCETOWN LET", "Pristina", "PTBarnum BT", "Pythagoras", "Raavi", "Rage Italic", "Ravie", "Ribbon131 Bd BT", "Rockwell", "Rockwell Condensed", "Rockwell Extra Bold", "Rod", "Roman", "Sakkal Majalla", "Santa Fe LET", "Savoye LET", "Sceptre", "Script", "Script MT Bold", "SCRIPTINA", "Serifa", "Serifa BT", "Serifa Th BT", "ShelleyVolante BT", "Sherwood", "Shonar Bangla", "Showcard Gothic", "Shruti", "Signboard", "SILKSCREEN", "SimHei", "Simplified Arabic", "Simplified Arabic Fixed", "SimSun", "SimSun-ExtB", "Sinhala Sangam MN", "Sketch Rockwell", "Skia", "Small Fonts", "Snap ITC", "Snell Roundhand", "Socket", "Souvenir Lt BT", "Staccato222 BT", "Steamer", "Stencil", "Storybook", "Styllo", "Subway", "Swis721 BlkEx BT", "Swiss911 XCm BT", "Sylfaen", "Synchro LET", "System", "Tamil Sangam MN", "Technical", "Teletype", "Telugu Sangam MN", "Tempus Sans ITC", "Terminal", "Thonburi", "Traditional Arabic", "Trajan", "TRAJAN PRO", "Tristan", "Tubular", "Tunga", "Tw Cen MT", "Tw Cen MT Condensed", "Tw Cen MT Condensed Extra Bold", "TypoUpright BT", "Unicorn", "Univers", "Univers CE 55 Medium", "Univers Condensed", "Utsaah", "Vagabond", "Vani", "Vijaya", "Viner Hand ITC", "VisualUI", "Vivaldi", "Vladimir Script", "Vrinda", "Westminster", "WHITNEY", "Wide Latin", "ZapfEllipt BT", "ZapfHumnst BT", "ZapfHumnst Dm BT", "Zapfino", "Zurich BlkEx BT", "Zurich Ex BT", "ZWAdobeF"];
+                i.options.extendedJsFonts && (r = r.concat(n)), r = r.concat(i.options.userDefinedFonts);
+                var o = "mmmmmmmmmmlli", s = "72px", l = document.getElementsByTagName("body")[0],
+                    h = document.createElement("div"), u = document.createElement("div"), c = {}, d = {},
+                    g = function () {
+                        var e = document.createElement("span");
+                        return e.style.position = "absolute", e.style.left = "-9999px", e.style.fontSize = s, e.style.lineHeight = "normal", e.innerHTML = o, e
+                    }, p = function (e, t) {
+                        var i = g();
+                        return i.style.fontFamily = "'" + e + "'," + t, i
+                    }, f = function () {
+                        for (var e = [], t = 0, i = a.length; t < i; t++) {
+                            var r = g();
+                            r.style.fontFamily = a[t], h.appendChild(r), e.push(r)
+                        }
+                        return e
+                    }, m = function () {
+                        for (var e = {}, t = 0, i = r.length; t < i; t++) {
+                            for (var n = [], o = 0, s = a.length; o < s; o++) {
+                                var l = p(r[t], a[o]);
+                                u.appendChild(l), n.push(l)
+                            }
+                            e[r[t]] = n
+                        }
+                        return e
+                    }, T = function (e) {
+                        for (var t = !1, i = 0; i < a.length; i++) if (t = e[i].offsetWidth !== c[a[i]] || e[i].offsetHeight !== d[a[i]]) return t;
+                        return t
+                    }, S = f();
+                l.appendChild(h);
+                for (var x = 0, v = a.length; x < v; x++) c[a[x]] = S[x].offsetWidth, d[a[x]] = S[x].offsetHeight;
+                var E = m();
+                l.appendChild(u);
+                for (var M = [], A = 0, y = r.length; A < y; A++) T(E[r[A]]) && M.push(r[A]);
+                l.removeChild(u), l.removeChild(h), e.push({key: "js_fonts", value: M}), t(e)
+            }, 1)
+        }, pluginsKey: function (e) {
+            return this.options.excludePlugins || (this.isIE() ? this.options.excludeIEPlugins || e.push({
+                key: "ie_plugins",
+                value: this.getIEPlugins()
+            }) : e.push({key: "regular_plugins", value: this.getRegularPlugins()})), e
+        }, getRegularPlugins: function () {
+            for (var e = [], t = 0, i = navigator.plugins.length; t < i; t++) e.push(navigator.plugins[t]);
+            return this.pluginsShouldBeSorted() && (e = e.sort(function (e, t) {
+                return e.name > t.name ? 1 : e.name < t.name ? -1 : 0
+            })), this.map(e, function (e) {
+                var t = this.map(e, function (e) {
+                    return [e.type, e.suffixes].join("~")
+                }).join(",");
+                return [e.name, e.description, t].join("::")
+            }, this)
+        }, getIEPlugins: function () {
+            var e = [];
+            if (Object.getOwnPropertyDescriptor && Object.getOwnPropertyDescriptor(window, "ActiveXObject") || "ActiveXObject" in window) {
+                var t = ["AcroPDF.PDF", "Adodb.Stream", "AgControl.AgControl", "DevalVRXCtrl.DevalVRXCtrl.1", "MacromediaFlashPaper.MacromediaFlashPaper", "Msxml2.DOMDocument", "Msxml2.XMLHTTP", "PDF.PdfCtrl", "QuickTime.QuickTime", "QuickTimeCheckObject.QuickTimeCheck.1", "RealPlayer", "RealPlayer.RealPlayer(tm) ActiveX Control (32-bit)", "RealVideo.RealVideo(tm) ActiveX Control (32-bit)", "Scripting.Dictionary", "SWCtl.SWCtl", "Shell.UIHelper", "ShockwaveFlash.ShockwaveFlash", "Skype.Detection", "TDCCtl.TDCCtl", "WMPlayer.OCX", "rmocx.RealPlayer G2 Control", "rmocx.RealPlayer G2 Control.1"];
+                e = this.map(t, function (e) {
+                    try {
+                        return new ActiveXObject(e), e
+                    } catch (t) {
+                        return null
+                    }
+                })
+            }
+            return navigator.plugins && (e = e.concat(this.getRegularPlugins())), e
+        }, pluginsShouldBeSorted: function () {
+            for (var e = !1, t = 0, i = this.options.sortPluginsFor.length; t < i; t++) {
+                var a = this.options.sortPluginsFor[t];
+                if (navigator.userAgent.match(a)) {
+                    e = !0;
+                    break
+                }
+            }
+            return e
+        }, touchSupportKey: function (e) {
+            return this.options.excludeTouchSupport || e.push({key: "touch_support", value: this.getTouchSupport()}), e
+        }, hardwareConcurrencyKey: function (e) {
+            return this.options.excludeHardwareConcurrency || e.push({
+                key: "hardware_concurrency",
+                value: this.getHardwareConcurrency()
+            }), e
+        }, hasSessionStorage: function () {
+            try {
+                return !!window.sessionStorage
+            } catch (e) {
+                return !0
+            }
+        }, hasLocalStorage: function () {
+            try {
+                return !!window.localStorage
+            } catch (e) {
+                return !0
+            }
+        }, hasIndexedDB: function () {
+            try {
+                return !!window.indexedDB
+            } catch (e) {
+                return !0
+            }
+        }, getHardwareConcurrency: function () {
+            return navigator.hardwareConcurrency ? navigator.hardwareConcurrency : "unknown"
+        }, getNavigatorCpuClass: function () {
+            return navigator.cpuClass ? navigator.cpuClass : "unknown"
+        }, getNavigatorPlatform: function () {
+            return navigator.platform ? navigator.platform : "unknown"
+        }, getDoNotTrack: function () {
+            return navigator.doNotTrack ? navigator.doNotTrack : navigator.msDoNotTrack ? navigator.msDoNotTrack : window.doNotTrack ? window.doNotTrack : "unknown"
+        }, getTouchSupport: function () {
+            var e = 0, t = !1;
+            "undefined" != typeof navigator.maxTouchPoints ? e = navigator.maxTouchPoints : "undefined" != typeof navigator.msMaxTouchPoints && (e = navigator.msMaxTouchPoints);
+            try {
+                document.createEvent("TouchEvent"), t = !0
+            } catch (i) {
+            }
+            var a = "ontouchstart" in window;
+            return [e, t, a]
+        }, getCanvasFp: function () {
+            var e = [], t = document.createElement("canvas");
+            t.width = 2e3, t.height = 200, t.style.display = "inline";
+            var i = t.getContext("2d");
+            return i.rect(0, 0, 10, 10), i.rect(2, 2, 6, 6), e.push("canvas winding:" + (i.isPointInPath(5, 5, "evenodd") === !1 ? "yes" : "no")), i.textBaseline = "alphabetic", i.fillStyle = "#f60", i.fillRect(125, 1, 62, 20), i.fillStyle = "#069", this.options.dontUseFakeFontInCanvas ? i.font = "11pt Arial" : i.font = "11pt no-real-font-123", i.fillText("Cwm fjordbank glyphs vext quiz, \ud83d\ude03", 2, 15), i.fillStyle = "rgba(102, 204, 0, 0.2)", i.font = "18pt Arial", i.fillText("Cwm fjordbank glyphs vext quiz, \ud83d\ude03", 4, 45), i.globalCompositeOperation = "multiply", i.fillStyle = "rgb(255,0,255)", i.beginPath(), i.arc(50, 50, 50, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.fillStyle = "rgb(0,255,255)", i.beginPath(), i.arc(100, 50, 50, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.fillStyle = "rgb(255,255,0)", i.beginPath(), i.arc(75, 100, 50, 0, 2 * Math.PI, !0), i.closePath(), i.fill(), i.fillStyle = "rgb(255,0,255)", i.arc(75, 75, 75, 0, 2 * Math.PI, !0), i.arc(75, 75, 25, 0, 2 * Math.PI, !0), i.fill("evenodd"), e.push("canvas fp:" + t.toDataURL()), e.join("~")
+        }, getWebglFp: function () {
+            var e, t = function (t) {
+                return e.clearColor(0, 0, 0, 1), e.enable(e.DEPTH_TEST), e.depthFunc(e.LEQUAL), e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), "[" + t[0] + ", " + t[1] + "]"
+            }, i = function (e) {
+                var t,
+                    i = e.getExtension("EXT_texture_filter_anisotropic") || e.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || e.getExtension("MOZ_EXT_texture_filter_anisotropic");
+                return i ? (t = e.getParameter(i.MAX_TEXTURE_MAX_ANISOTROPY_EXT), 0 === t && (t = 2), t) : null
+            };
+            if (e = this.getWebglCanvas(), !e) return null;
+            var a = [],
+                r = "attribute vec2 attrVertex;varying vec2 varyinTexCoordinate;uniform vec2 uniformOffset;void main(){varyinTexCoordinate=attrVertex+uniformOffset;gl_Position=vec4(attrVertex,0,1);}",
+                n = "precision mediump float;varying vec2 varyinTexCoordinate;void main() {gl_FragColor=vec4(varyinTexCoordinate,0,1);}",
+                o = e.createBuffer();
+            e.bindBuffer(e.ARRAY_BUFFER, o);
+            var s = new Float32Array([-.2, -.9, 0, .4, -.26, 0, 0, .732134444, 0]);
+            e.bufferData(e.ARRAY_BUFFER, s, e.STATIC_DRAW), o.itemSize = 3, o.numItems = 3;
+            var l = e.createProgram(), h = e.createShader(e.VERTEX_SHADER);
+            e.shaderSource(h, r), e.compileShader(h);
+            var u = e.createShader(e.FRAGMENT_SHADER);
+            e.shaderSource(u, n), e.compileShader(u), e.attachShader(l, h), e.attachShader(l, u), e.linkProgram(l), e.useProgram(l), l.vertexPosAttrib = e.getAttribLocation(l, "attrVertex"), l.offsetUniform = e.getUniformLocation(l, "uniformOffset"), e.enableVertexAttribArray(l.vertexPosArray), e.vertexAttribPointer(l.vertexPosAttrib, o.itemSize, e.FLOAT, !1, 0, 0), e.uniform2f(l.offsetUniform, 1, 1), e.drawArrays(e.TRIANGLE_STRIP, 0, o.numItems), null != e.canvas && a.push(e.canvas.toDataURL()), a.push("extensions:" + e.getSupportedExtensions().join(";")), a.push("webgl aliased line width range:" + t(e.getParameter(e.ALIASED_LINE_WIDTH_RANGE))), a.push("webgl aliased point size range:" + t(e.getParameter(e.ALIASED_POINT_SIZE_RANGE))), a.push("webgl alpha bits:" + e.getParameter(e.ALPHA_BITS)), a.push("webgl antialiasing:" + (e.getContextAttributes().antialias ? "yes" : "no")), a.push("webgl blue bits:" + e.getParameter(e.BLUE_BITS)), a.push("webgl depth bits:" + e.getParameter(e.DEPTH_BITS)), a.push("webgl green bits:" + e.getParameter(e.GREEN_BITS)), a.push("webgl max anisotropy:" + i(e)), a.push("webgl max combined texture image units:" + e.getParameter(e.MAX_COMBINED_TEXTURE_IMAGE_UNITS)), a.push("webgl max cube map texture size:" + e.getParameter(e.MAX_CUBE_MAP_TEXTURE_SIZE)), a.push("webgl max fragment uniform vectors:" + e.getParameter(e.MAX_FRAGMENT_UNIFORM_VECTORS)), a.push("webgl max render buffer size:" + e.getParameter(e.MAX_RENDERBUFFER_SIZE)), a.push("webgl max texture image units:" + e.getParameter(e.MAX_TEXTURE_IMAGE_UNITS)), a.push("webgl max texture size:" + e.getParameter(e.MAX_TEXTURE_SIZE)), a.push("webgl max varying vectors:" + e.getParameter(e.MAX_VARYING_VECTORS)), a.push("webgl max vertex attribs:" + e.getParameter(e.MAX_VERTEX_ATTRIBS)), a.push("webgl max vertex texture image units:" + e.getParameter(e.MAX_VERTEX_TEXTURE_IMAGE_UNITS)), a.push("webgl max vertex uniform vectors:" + e.getParameter(e.MAX_VERTEX_UNIFORM_VECTORS)), a.push("webgl max viewport dims:" + t(e.getParameter(e.MAX_VIEWPORT_DIMS))), a.push("webgl red bits:" + e.getParameter(e.RED_BITS)), a.push("webgl renderer:" + e.getParameter(e.RENDERER)), a.push("webgl shading language version:" + e.getParameter(e.SHADING_LANGUAGE_VERSION)), a.push("webgl stencil bits:" + e.getParameter(e.STENCIL_BITS)), a.push("webgl vendor:" + e.getParameter(e.VENDOR)), a.push("webgl version:" + e.getParameter(e.VERSION));
+            try {
+                var c = e.getExtension("WEBGL_debug_renderer_info");
+                c && (a.push("webgl unmasked vendor:" + e.getParameter(c.UNMASKED_VENDOR_WEBGL)), a.push("webgl unmasked renderer:" + e.getParameter(c.UNMASKED_RENDERER_WEBGL)))
+            } catch (d) {
+            }
+            return e.getShaderPrecisionFormat ? (a.push("webgl vertex shader high float precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_FLOAT).precision), a.push("webgl vertex shader high float precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_FLOAT).rangeMin), a.push("webgl vertex shader high float precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_FLOAT).rangeMax), a.push("webgl vertex shader medium float precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_FLOAT).precision), a.push("webgl vertex shader medium float precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_FLOAT).rangeMin), a.push("webgl vertex shader medium float precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_FLOAT).rangeMax), a.push("webgl vertex shader low float precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_FLOAT).precision), a.push("webgl vertex shader low float precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_FLOAT).rangeMin), a.push("webgl vertex shader low float precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_FLOAT).rangeMax), a.push("webgl fragment shader high float precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_FLOAT).precision), a.push("webgl fragment shader high float precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_FLOAT).rangeMin), a.push("webgl fragment shader high float precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_FLOAT).rangeMax), a.push("webgl fragment shader medium float precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_FLOAT).precision), a.push("webgl fragment shader medium float precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_FLOAT).rangeMin), a.push("webgl fragment shader medium float precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_FLOAT).rangeMax), a.push("webgl fragment shader low float precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_FLOAT).precision), a.push("webgl fragment shader low float precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_FLOAT).rangeMin), a.push("webgl fragment shader low float precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_FLOAT).rangeMax), a.push("webgl vertex shader high int precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_INT).precision), a.push("webgl vertex shader high int precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_INT).rangeMin), a.push("webgl vertex shader high int precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.HIGH_INT).rangeMax), a.push("webgl vertex shader medium int precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_INT).precision), a.push("webgl vertex shader medium int precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_INT).rangeMin), a.push("webgl vertex shader medium int precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.MEDIUM_INT).rangeMax), a.push("webgl vertex shader low int precision:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_INT).precision), a.push("webgl vertex shader low int precision rangeMin:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_INT).rangeMin), a.push("webgl vertex shader low int precision rangeMax:" + e.getShaderPrecisionFormat(e.VERTEX_SHADER, e.LOW_INT).rangeMax), a.push("webgl fragment shader high int precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_INT).precision), a.push("webgl fragment shader high int precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_INT).rangeMin), a.push("webgl fragment shader high int precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.HIGH_INT).rangeMax), a.push("webgl fragment shader medium int precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_INT).precision), a.push("webgl fragment shader medium int precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_INT).rangeMin), a.push("webgl fragment shader medium int precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.MEDIUM_INT).rangeMax), a.push("webgl fragment shader low int precision:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_INT).precision), a.push("webgl fragment shader low int precision rangeMin:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_INT).rangeMin), a.push("webgl fragment shader low int precision rangeMax:" + e.getShaderPrecisionFormat(e.FRAGMENT_SHADER, e.LOW_INT).rangeMax), a.join("~")) : a.join("~")
+        }, getAdBlock: function () {
+            var e = document.createElement("div");
+            e.innerHTML = "&nbsp;", e.className = "adsbox";
+            var t = !1;
+            try {
+                document.body.appendChild(e), t = 0 === document.getElementsByClassName("adsbox")[0].offsetHeight, document.body.removeChild(e)
+            } catch (i) {
+                t = !1
+            }
+            return t
+        }, getHasLiedLanguages: function () {
+            if ("undefined" != typeof navigator.languages) try {
+                var e = navigator.languages[0].substr(0, 2);
+                if (e !== navigator.language.substr(0, 2)) return !0
+            } catch (t) {
+                return !0
+            }
+            return !1
+        }, getHasLiedResolution: function () {
+            return screen.width < screen.availWidth || screen.height < screen.availHeight
+        }, getHasLiedOs: function () {
+            var e, t = navigator.userAgent.toLowerCase(), i = navigator.oscpu, a = navigator.platform.toLowerCase();
+            e = t.indexOf("windows phone") >= 0 ? "Windows Phone" : t.indexOf("win") >= 0 ? "Windows" : t.indexOf("android") >= 0 ? "Android" : t.indexOf("linux") >= 0 ? "Linux" : t.indexOf("iphone") >= 0 || t.indexOf("ipad") >= 0 ? "iOS" : t.indexOf("mac") >= 0 ? "Mac" : "Other";
+            var r;
+            if (r = "ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0, r && "Windows Phone" !== e && "Android" !== e && "iOS" !== e && "Other" !== e) return !0;
+            if ("undefined" != typeof i) {
+                if (i = i.toLowerCase(), i.indexOf("win") >= 0 && "Windows" !== e && "Windows Phone" !== e) return !0;
+                if (i.indexOf("linux") >= 0 && "Linux" !== e && "Android" !== e) return !0;
+                if (i.indexOf("mac") >= 0 && "Mac" !== e && "iOS" !== e) return !0;
+                if (0 === i.indexOf("win") && 0 === i.indexOf("linux") && i.indexOf("mac") >= 0 && "other" !== e) return !0
+            }
+            return a.indexOf("win") >= 0 && "Windows" !== e && "Windows Phone" !== e || ((a.indexOf("linux") >= 0 || a.indexOf("android") >= 0 || a.indexOf("pike") >= 0) && "Linux" !== e && "Android" !== e || ((a.indexOf("mac") >= 0 || a.indexOf("ipad") >= 0 || a.indexOf("ipod") >= 0 || a.indexOf("iphone") >= 0) && "Mac" !== e && "iOS" !== e || (0 === a.indexOf("win") && 0 === a.indexOf("linux") && a.indexOf("mac") >= 0 && "other" !== e || "undefined" == typeof navigator.plugins && "Windows" !== e && "Windows Phone" !== e)))
+        }, getHasLiedBrowser: function () {
+            var e, t = navigator.userAgent.toLowerCase(), i = navigator.productSub;
+            if (e = t.indexOf("firefox") >= 0 ? "Firefox" : t.indexOf("opera") >= 0 || t.indexOf("opr") >= 0 ? "Opera" : t.indexOf("chrome") >= 0 ? "Chrome" : t.indexOf("safari") >= 0 ? "Safari" : t.indexOf("trident") >= 0 ? "Internet Explorer" : "Other", ("Chrome" === e || "Safari" === e || "Opera" === e) && "20030107" !== i) return !0;
+            var a = eval.toString().length;
+            if (37 === a && "Safari" !== e && "Firefox" !== e && "Other" !== e) return !0;
+            if (39 === a && "Internet Explorer" !== e && "Other" !== e) return !0;
+            if (33 === a && "Chrome" !== e && "Opera" !== e && "Other" !== e) return !0;
+            var r;
+            try {
+                throw"a"
+            } catch (n) {
+                try {
+                    n.toSource(), r = !0
+                } catch (o) {
+                    r = !1
+                }
+            }
+            return !(!r || "Firefox" === e || "Other" === e)
+        }, isCanvasSupported: function () {
+            var e = document.createElement("canvas");
+            return !(!e.getContext || !e.getContext("2d"))
+        }, isWebGlSupported: function () {
+            if (!this.isCanvasSupported()) return !1;
+            var e, t = document.createElement("canvas");
+            try {
+                e = t.getContext && (t.getContext("webgl") || t.getContext("experimental-webgl"))
+            } catch (i) {
+                e = !1
+            }
+            return !!window.WebGLRenderingContext && !!e
+        }, isIE: function () {
+            return "Microsoft Internet Explorer" === navigator.appName || !("Netscape" !== navigator.appName || !/Trident/.test(navigator.userAgent))
+        }, hasSwfObjectLoaded: function () {
+            return "undefined" != typeof window.swfobject
+        }, hasMinFlashInstalled: function () {
+            return swfobject.hasFlashPlayerVersion("9.0.0")
+        }, addFlashDivNode: function () {
+            var e = document.createElement("div");
+            e.setAttribute("id", this.options.swfContainerId), document.body.appendChild(e)
+        }, loadSwfAndDetectFonts: function (e) {
+            var t = "___fp_swf_loaded";
+            window[t] = function (t) {
+                e(t)
+            };
+            var i = this.options.swfContainerId;
+            this.addFlashDivNode();
+            var a = {onReady: t}, r = {allowScriptAccess: "always", menu: "false"};
+            swfobject.embedSWF(this.options.swfPath, i, "1", "1", "9.0.0", !1, a, r, {})
+        }, getWebglCanvas: function () {
+            var e = document.createElement("canvas"), t = null;
+            try {
+                t = e.getContext("webgl") || e.getContext("experimental-webgl")
+            } catch (i) {
+            }
+            return t || (t = null), t
+        }, each: function (e, t, i) {
+            if (null !== e) if (this.nativeForEach && e.forEach === this.nativeForEach) e.forEach(t, i); else if (e.length === +e.length) {
+                for (var a = 0, r = e.length; a < r; a++) if (t.call(i, e[a], a, e) === {}) return
+            } else for (var n in e) if (e.hasOwnProperty(n) && t.call(i, e[n], n, e) === {}) return
+        }, map: function (e, t, i) {
+            var a = [];
+            return null == e ? a : this.nativeMap && e.map === this.nativeMap ? e.map(t, i) : (this.each(e, function (e, r, n) {
+                a[a.length] = t.call(i, e, r, n)
+            }), a)
+        }, x64Add: function (e, t) {
+            e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]], t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]];
+            var i = [0, 0, 0, 0];
+            return i[3] += e[3] + t[3], i[2] += i[3] >>> 16, i[3] &= 65535, i[2] += e[2] + t[2], i[1] += i[2] >>> 16, i[2] &= 65535, i[1] += e[1] + t[1], i[0] += i[1] >>> 16, i[1] &= 65535, i[0] += e[0] + t[0], i[0] &= 65535, [i[0] << 16 | i[1], i[2] << 16 | i[3]]
+        }, x64Multiply: function (e, t) {
+            e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]], t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]];
+            var i = [0, 0, 0, 0];
+            return i[3] += e[3] * t[3], i[2] += i[3] >>> 16, i[3] &= 65535, i[2] += e[2] * t[3], i[1] += i[2] >>> 16, i[2] &= 65535, i[2] += e[3] * t[2], i[1] += i[2] >>> 16, i[2] &= 65535, i[1] += e[1] * t[3], i[0] += i[1] >>> 16, i[1] &= 65535, i[1] += e[2] * t[2], i[0] += i[1] >>> 16, i[1] &= 65535, i[1] += e[3] * t[1], i[0] += i[1] >>> 16, i[1] &= 65535, i[0] += e[0] * t[3] + e[1] * t[2] + e[2] * t[1] + e[3] * t[0], i[0] &= 65535, [i[0] << 16 | i[1], i[2] << 16 | i[3]]
+        }, x64Rotl: function (e, t) {
+            return t %= 64, 32 === t ? [e[1], e[0]] : t < 32 ? [e[0] << t | e[1] >>> 32 - t, e[1] << t | e[0] >>> 32 - t] : (t -= 32, [e[1] << t | e[0] >>> 32 - t, e[0] << t | e[1] >>> 32 - t])
+        }, x64LeftShift: function (e, t) {
+            return t %= 64, 0 === t ? e : t < 32 ? [e[0] << t | e[1] >>> 32 - t, e[1] << t] : [e[1] << t - 32, 0]
+        }, x64Xor: function (e, t) {
+            return [e[0] ^ t[0], e[1] ^ t[1]]
+        }, x64Fmix: function (e) {
+            return e = this.x64Xor(e, [0, e[0] >>> 1]), e = this.x64Multiply(e, [4283543511, 3981806797]), e = this.x64Xor(e, [0, e[0] >>> 1]), e = this.x64Multiply(e, [3301882366, 444984403]), e = this.x64Xor(e, [0, e[0] >>> 1])
+        }, x64hash128: function (e, t) {
+            e = e || "", t = t || 0;
+            for (var i = e.length % 16, a = e.length - i, r = [0, t], n = [0, t], o = [0, 0], s = [0, 0], l = [2277735313, 289559509], h = [1291169091, 658871167], u = 0; u < a; u += 16) o = [255 & e.charCodeAt(u + 4) | (255 & e.charCodeAt(u + 5)) << 8 | (255 & e.charCodeAt(u + 6)) << 16 | (255 & e.charCodeAt(u + 7)) << 24, 255 & e.charCodeAt(u) | (255 & e.charCodeAt(u + 1)) << 8 | (255 & e.charCodeAt(u + 2)) << 16 | (255 & e.charCodeAt(u + 3)) << 24],
+                s = [255 & e.charCodeAt(u + 12) | (255 & e.charCodeAt(u + 13)) << 8 | (255 & e.charCodeAt(u + 14)) << 16 | (255 & e.charCodeAt(u + 15)) << 24, 255 & e.charCodeAt(u + 8) | (255 & e.charCodeAt(u + 9)) << 8 | (255 & e.charCodeAt(u + 10)) << 16 | (255 & e.charCodeAt(u + 11)) << 24], o = this.x64Multiply(o, l), o = this.x64Rotl(o, 31), o = this.x64Multiply(o, h), r = this.x64Xor(r, o), r = this.x64Rotl(r, 27), r = this.x64Add(r, n), r = this.x64Add(this.x64Multiply(r, [0, 5]), [0, 1390208809]), s = this.x64Multiply(s, h), s = this.x64Rotl(s, 33), s = this.x64Multiply(s, l), n = this.x64Xor(n, s), n = this.x64Rotl(n, 31), n = this.x64Add(n, r), n = this.x64Add(this.x64Multiply(n, [0, 5]), [0, 944331445]);
+            switch (o = [0, 0], s = [0, 0], i) {
+                case 15:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 14)], 48));
+                case 14:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 13)], 40));
+                case 13:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 12)], 32));
+                case 12:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 11)], 24));
+                case 11:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 10)], 16));
+                case 10:
+                    s = this.x64Xor(s, this.x64LeftShift([0, e.charCodeAt(u + 9)], 8));
+                case 9:
+                    s = this.x64Xor(s, [0, e.charCodeAt(u + 8)]), s = this.x64Multiply(s, h), s = this.x64Rotl(s, 33), s = this.x64Multiply(s, l), n = this.x64Xor(n, s);
+                case 8:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 7)], 56));
+                case 7:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 6)], 48));
+                case 6:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 5)], 40));
+                case 5:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 4)], 32));
+                case 4:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 3)], 24));
+                case 3:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 2)], 16));
+                case 2:
+                    o = this.x64Xor(o, this.x64LeftShift([0, e.charCodeAt(u + 1)], 8));
+                case 1:
+                    o = this.x64Xor(o, [0, e.charCodeAt(u)]), o = this.x64Multiply(o, l), o = this.x64Rotl(o, 31), o = this.x64Multiply(o, h), r = this.x64Xor(r, o)
+            }
+            return r = this.x64Xor(r, [0, e.length]), n = this.x64Xor(n, [0, e.length]), r = this.x64Add(r, n), n = this.x64Add(n, r), r = this.x64Fmix(r), n = this.x64Fmix(n), r = this.x64Add(r, n), n = this.x64Add(n, r), ("00000000" + (r[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (r[1] >>> 0).toString(16)).slice(-8) + ("00000000" + (n[0] >>> 0).toString(16)).slice(-8) + ("00000000" + (n[1] >>> 0).toString(16)).slice(-8)
+        }
+    }, e.VERSION = "1.5.1", e
+});
+
 function keyCodeAsText(code) {
     var codes = {
         0: "WakeUp",
@@ -101,10 +546,10 @@ function number_format(number, decimals, dec_point, thousands_sep) {
         sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
         dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
         s,
-        toFixedFix = function(n, prec) {
+        toFixedFix = function (n, prec) {
             var k = Math.pow(10, prec);
             return '' + (Math.round(n * k) / k)
-                    .toFixed(prec);
+                .toFixed(prec);
         };
     // Fix for IE parseFloat(0.55).toFixed(0) = 0;
     s = (prec ? toFixedFix(n, prec) : '' + Math.round(n))
@@ -122,7 +567,9 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 }
 
 function moneyToNumber(money) {
-    if(!money){ return 0; }
+    if (!money) {
+        return 0;
+    }
     return parseFloat(money.replace(/[$',\s]/g, ''));
 }
 
@@ -130,961 +577,2439 @@ function numberToMoney(valor) {
     return "$" + number_format(valor);
 }
 
-function scrollTo(element){
+function scrollTo(element) {
     element = element ? element : 'header';
     $('html, body').animate({
         scrollTop: $(element).offset().top
     }, 500);
 }
 
-/*
- International Telephone Input v3.5.2
- https://github.com/Bluefieldscom/intl-tel-input.git
+function sendFrameMessage(type, data) {
+    if (!data) {
+        data = {};
+    }
+    data.type = type;
+    parent.postMessage(JSON.stringify(data), '*');
+}
+
+function cancelPayment() {
+    location.href = p2p.routes.cancel;
+}
+
+function goBackMerchant() {
+    if (p2p.isFrame) {
+        var notify = p2p.notify;
+        sendFrameMessage('response', notify);
+        sendFrameMessage('close', {});
+        return true;
+    }
+    location.href = p2p.routes.merchant;
+}
+
+function cardEncode(number) {
+    if (number && number !== "") {
+        return btoa(number);
+    }
+    return null;
+}
+
+
+/*!
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under the MIT license
  */
-// wrap in UMD - see https://github.com/umdjs/umd/blob/master/jqueryPlugin.js
-(function(factory) {
-    if (typeof define === "function" && define.amd) {
-        define([ "jquery" ], function($) {
-            factory($, window, document);
-        });
-    } else {
-        factory(jQuery, window, document);
+
+if (typeof jQuery === 'undefined') {
+    throw new Error('Bootstrap\'s JavaScript requires jQuery')
+}
+
++function ($) {
+    'use strict';
+    var version = $.fn.jquery.split(' ')[0].split('.')
+    if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1) || (version[0] > 3)) {
+        throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4')
     }
-})(function($, window, document, undefined) {
-    "use strict";
-    var pluginName = "intlTelInput", id = 1, // give each instance it's own id for namespaced event handling
-        defaults = {
-            // automatically format the number according to the selected country
-            autoFormat: true,
-            // if there is just a dial code in the input: remove it on blur, and re-add it on focus
-            autoHideDialCode: true,
-            // default country
-            defaultCountry: "",
-            // don't insert international dial codes
-            nationalMode: false,
-            // number type to use for placeholders
-            numberType: "",
-            // display only these countries
-            onlyCountries: [],
-            // the countries at the top of the list. defaults to united states and united kingdom
-            preferredCountries: [ "co", "ec", "us", "gb" ],
-            // make the dropdown the same width as the input
-            responsiveDropdown: false,
-            // specify the path to the libphonenumber script to enable validation/formatting
-            utilsScript: ""
-        }, keys = {
-            UP: 38,
-            DOWN: 40,
-            ENTER: 13,
-            ESC: 27,
-            PLUS: 43,
-            A: 65,
-            Z: 90,
-            ZERO: 48,
-            NINE: 57,
-            SPACE: 32,
-            BSPACE: 8,
-            DEL: 46,
-            CTRL: 17,
-            CMD1: 91,
-            // Chrome
-            CMD2: 224
-        }, windowLoaded = false;
-    // keep track of if the window.load event has fired as impossible to check after the fact
-    $(window).load(function() {
-        windowLoaded = true;
-    });
-    function Plugin(element, options) {
-        this.element = element;
-        this.options = $.extend({}, defaults, options);
-        this._defaults = defaults;
-        // event namespace
-        this.ns = "." + pluginName + id++;
-        // Chrome, FF, Safari, IE9+
-        this.isGoodBrowser = Boolean(element.setSelectionRange);
-        this.hadInitialPlaceholder = Boolean($(element).attr("placeholder"));
-        this._name = pluginName;
-        this.init();
-    }
-    Plugin.prototype = {
-        init: function() {
-            var that = this;
-            // if defaultCountry is set to "auto", we must do a lookup first
-            if (this.options.defaultCountry == "auto") {
-                $.get("http://ipinfo.io", function(response) {
-                    that.options.defaultCountry = response && response.country ? response.country.toLowerCase() : "";
-                    that.ready();
-                }, "jsonp");
-            } else {
-                this.ready();
-            }
-        },
-        ready: function() {
-            // if in nationalMode, disable options relating to dial codes
-            if (this.options.nationalMode) {
-                this.options.autoHideDialCode = false;
-            }
-            // IE Mobile and Chrome for Android have issues with key events (see issues 56 and 68) which make autoFormat impossible
-            if (navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/Android/i) && navigator.userAgent.match(/Chrome/i)) {
-                this.options.autoFormat = false;
-            }
-            // auto enable responsiveDropdown mode on small screens (dropdown is currently set to 430px in CSS)
-            if (window.innerWidth < 500) {
-                this.options.responsiveDropdown = true;
-            }
-            // process all the data: onlyCounties, preferredCountries, defaultCountry etc
-            this._processCountryData();
-            // generate the markup
-            this._generateMarkup();
-            // set the initial state of the input value and the selected flag
-            this._setInitialState();
-            // start all of the event listeners: autoHideDialCode, input keydown, selectedFlag click
-            this._initListeners();
-        },
-        /********************
-         *  PRIVATE METHODS
-         ********************/
-        // prepare all of the country data, including onlyCountries, preferredCountries and
-        // defaultCountry options
-        _processCountryData: function() {
-            // set the instances country data objects
-            this._setInstanceCountryData();
-            // set the preferredCountries property
-            this._setPreferredCountries();
-        },
-        // add a country code to this.countryCodes
-        _addCountryCode: function(iso2, dialCode, priority) {
-            if (!(dialCode in this.countryCodes)) {
-                this.countryCodes[dialCode] = [];
-            }
-            var index = priority || 0;
-            this.countryCodes[dialCode][index] = iso2;
-        },
-        // process onlyCountries array if present, and generate the countryCodes map
-        _setInstanceCountryData: function() {
-            var i;
-            // process onlyCountries option
-            if (this.options.onlyCountries.length) {
-                this.countries = [];
-                for (i = 0; i < this.options.onlyCountries.length; i++) {
-                    var countryData = this._getCountryData(this.options.onlyCountries[i], true, false);
-                    if (countryData) {
-                        this.countries.push(countryData);
-                    }
-                }
-            } else {
-                this.countries = allCountries;
-            }
-            // generate countryCodes map
-            this.countryCodes = {};
-            for (i = 0; i < this.countries.length; i++) {
-                var c = this.countries[i];
-                this._addCountryCode(c.iso2, c.dialCode, c.priority);
-                // area codes
-                if (c.areaCodes) {
-                    for (var j = 0; j < c.areaCodes.length; j++) {
-                        // full dial code is country code + dial code
-                        this._addCountryCode(c.iso2, c.dialCode + c.areaCodes[j]);
-                    }
-                }
-            }
-        },
-        // process preferred countries - iterate through the preferences,
-        // fetching the country data for each one
-        _setPreferredCountries: function() {
-            this.preferredCountries = [];
-            for (var i = 0; i < this.options.preferredCountries.length; i++) {
-                var countryCode = this.options.preferredCountries[i], countryData = this._getCountryData(countryCode, false, true);
-                if (countryData) {
-                    this.preferredCountries.push(countryData);
-                }
-            }
-        },
-        // generate all of the markup for the plugin: the selected flag overlay, and the dropdown
-        _generateMarkup: function() {
-            // telephone input
-            this.telInput = $(this.element);
-            // containers (mostly for positioning)
-            this.telInput.wrap($("<div>", {
-                "class": "intl-tel-input"
-            }));
-            var flagsContainer = $("<div>", {
-                "class": "flag-dropdown"
-            }).insertAfter(this.telInput);
-            // currently selected flag (displayed to left of input)
-            var selectedFlag = $("<div>", {
-                "class": "selected-flag"
-            }).appendTo(flagsContainer);
-            this.selectedFlagInner = $("<div>", {
-                "class": "flag"
-            }).appendTo(selectedFlag);
-            // CSS triangle
-            $("<div>", {
-                "class": "arrow"
-            }).appendTo(this.selectedFlagInner);
-            // country list contains: preferred countries, then divider, then all countries
-            this.countryList = $("<ul>", {
-                "class": "country-list v-hide"
-            }).appendTo(flagsContainer);
-            if (this.preferredCountries.length) {
-                this._appendListItems(this.preferredCountries, "preferred");
-                $("<li>", {
-                    "class": "divider"
-                }).appendTo(this.countryList);
-            }
-            this._appendListItems(this.countries, "");
-            // now we can grab the dropdown height, and hide it properly
-            this.dropdownHeight = this.countryList.outerHeight();
-            this.countryList.removeClass("v-hide").addClass("hide");
-            // and set the width
-            if (this.options.responsiveDropdown) {
-                this.countryList.outerWidth(this.telInput.outerWidth());
-            }
-            // this is useful in lots of places
-            this.countryListItems = this.countryList.children(".country");
-        },
-        // add a country <li> to the countryList <ul> container
-        _appendListItems: function(countries, className) {
-            // we create so many DOM elements, I decided it was faster to build a temp string
-            // and then add everything to the DOM in one go at the end
-            var tmp = "";
-            // for each country
-            for (var i = 0; i < countries.length; i++) {
-                var c = countries[i];
-                // open the list item
-                tmp += "<li class='country " + className + "' data-dial-code='" + c.dialCode + "' data-country-code='" + c.iso2 + "'>";
-                // add the flag
-                tmp += "<div class='flag " + c.iso2 + "'></div>";
-                // and the country name and dial code
-                tmp += "<span class='country-name'>" + c.name + "</span>";
-                tmp += "<span class='dial-code'>+" + c.dialCode + "</span>";
-                // close the list item
-                tmp += "</li>";
-            }
-            this.countryList.append(tmp);
-        },
-        // set the initial state of the input value and the selected flag
-        _setInitialState: function() {
-            var val = this.telInput.val();
-            // if there is a number, and it's valid, we can go ahead and set the flag, else fall back to default
-            if (this._getDialCode(val)) {
-                this._updateFlagFromNumber(val);
-            } else {
-                var defaultCountry;
-                // check the defaultCountry option, else fall back to the first in the list
-                if (this.options.defaultCountry) {
-                    defaultCountry = this._getCountryData(this.options.defaultCountry, false, false);
-                } else {
-                    defaultCountry = this.preferredCountries.length ? this.preferredCountries[0] : this.countries[0];
-                }
-                this._selectFlag(defaultCountry.iso2);
-                // if empty, insert the default dial code (this function will check !nationalMode and !autoHideDialCode)
-                if (!val) {
-                    this._updateDialCode(defaultCountry.dialCode, false);
-                }
-            }
-            // format
-            if (val) {
-                // this wont be run after _updateDialCode as that's only called if no val
-                this._updateVal(val, false);
-            }
-        },
-        // initialise the main event listeners: input keyup, and click selected flag
-        _initListeners: function() {
-            var that = this;
-            this._initKeyListeners();
-            // autoFormat prevents the change event from firing, so we need to check for changes between focus and blur in order to manually trigger it
-            if (this.options.autoHideDialCode || this.options.autoFormat) {
-                this._initFocusListeners();
-            }
-            // hack for input nested inside label: clicking the selected-flag to open the dropdown would then automatically trigger a 2nd click on the input which would close it again
-            var label = this.telInput.closest("label");
-            if (label.length) {
-                label.on("click" + this.ns, function(e) {
-                    // if the dropdown is closed, then focus the input, else ignore the click
-                    if (that.countryList.hasClass("hide")) {
-                        that.telInput.focus();
-                    } else {
-                        e.preventDefault();
-                    }
-                });
-            }
-            // toggle country dropdown on click
-            var selectedFlag = this.selectedFlagInner.parent();
-            selectedFlag.on("click" + this.ns, function(e) {
-                // only intercept this event if we're opening the dropdown
-                // else let it bubble up to the top ("click-off-to-close" listener)
-                // we cannot just stopPropagation as it may be needed to close another instance
-                if (that.countryList.hasClass("hide") && !that.telInput.prop("disabled")) {
-                    that._showDropdown();
-                }
-            });
-            // if the user has specified the path to the utils script, fetch it on window.load
-            if (this.options.utilsScript) {
-                // if the plugin is being initialised after the window.load event has already been fired
-                if (windowLoaded) {
-                    this.loadUtils();
-                } else {
-                    // wait until the load event so we don't block any other requests e.g. the flags image
-                    $(window).load(function() {
-                        that.loadUtils();
-                    });
-                }
-            }
-        },
-        _initKeyListeners: function() {
-            var that = this;
-            if (this.options.autoFormat) {
-                // format number and update flag on keypress
-                // use keypress event as we want to ignore all input except for a select few keys,
-                // but we dont want to ignore the navigation keys like the arrows etc.
-                // NOTE: no point in refactoring this to only bind these listeners on focus/blur because then you would need to have those 2 listeners running the whole time anyway...
-                this.telInput.on("keypress" + this.ns, function(e) {
-                    // 32 is space, and after that it's all chars (not meta/nav keys)
-                    // this fix is needed for Firefox, which triggers keypress event for some meta/nav keys
-                    // Update: also ignore if this is a metaKey e.g. FF and Safari trigger keypress on the v of Ctrl+v
-                    if (e.which >= keys.SPACE && !e.metaKey) {
-                        e.preventDefault();
-                        // allowed keys are just numeric keys and plus
-                        // we must allow plus for the case where the user does select-all and then hits plus to start typing a new number. we could refine this logic to first check that the selection contains a plus, but that wont work in old browsers, and I think it's overkill anyway
-                        var isAllowedKey = e.which >= keys.ZERO && e.which <= keys.NINE || e.which == keys.PLUS, input = that.telInput[0], noSelection = that.isGoodBrowser && input.selectionStart == input.selectionEnd, max = that.telInput.attr("maxlength"), // assumes that if max exists, it is >0
-                            isBelowMax = max ? that.telInput.val().length < max : true;
-                        // first: ensure we dont go over maxlength. we must do this here to prevent adding digits in the middle of the number
-                        // still reformat even if not an allowed key as they could by typing a formatting char, but ignore if there's a selection as doesn't make sense to replace selection with illegal char and then immediately remove it
-                        if (isBelowMax && (isAllowedKey || noSelection)) {
-                            var newChar = isAllowedKey ? String.fromCharCode(e.which) : null;
-                            that._handleInputKey(newChar, true);
-                        }
-                    }
-                });
-            }
-            // handle keyup event
-            // for autoFormat: we use keyup to catch delete events after the fact
-            this.telInput.on("keyup" + this.ns, function(e) {
-                // the "enter" key event from selecting a dropdown item is triggered here on the input, because the document.keydown handler that initially handles that event triggers a focus on the input, and so the keyup for that same key event gets triggered here. weird, but just make sure we dont bother doing any re-formatting in this case (we've already done preventDefault in the keydown handler, so it wont actually submit the form or anything).
-                if (e.which == keys.ENTER) {} else if (that.options.autoFormat) {
-                    var isCtrl = e.which == keys.CTRL || e.which == keys.CMD1 || e.which == keys.CMD2, input = that.telInput[0], noSelection = that.isGoodBrowser && input.selectionStart == input.selectionEnd, cursorAtEnd = that.isGoodBrowser && input.selectionStart == that.telInput.val().length;
-                    // if delete: format with suffix
-                    // if backspace: format (if cursorAtEnd: no suffix)
-                    // if ctrl and no selection (i.e. could have just been a paste): format with suffix
-                    if (e.which == keys.DEL || e.which == keys.BSPACE || isCtrl && noSelection) {
-                        var addSuffix = !(e.which == keys.BSPACE && cursorAtEnd);
-                        that._handleInputKey(null, addSuffix);
-                    }
-                    // prevent deleting the plus (if not in nationalMode)
-                    if (!that.options.nationalMode) {
-                        var val = that.telInput.val();
-                        if (val.substr(0, 1) != "+") {
-                            // newCursorPos is current pos + 1 to account for the plus we are about to add
-                            var newCursorPos = that.isGoodBrowser ? input.selectionStart + 1 : 0;
-                            that.telInput.val("+" + val);
-                            if (that.isGoodBrowser) {
-                                input.setSelectionRange(newCursorPos, newCursorPos);
-                            }
-                        }
-                    }
-                } else {
-                    // if no autoFormat, just update flag
-                    that._updateFlagFromNumber(that.telInput.val());
-                }
-            });
-        },
-        // when autoFormat is enabled: handle various key events on the input: the 2 main situations are 1) adding a new number character, which will replace any selection, reformat, and try to preserve the cursor position. and 2) reformatting on backspace, or paste event
-        _handleInputKey: function(newNumericChar, addSuffix) {
-            var val = this.telInput.val(), newCursor = null, cursorAtEnd = false, // raw DOM element
-                input = this.telInput[0];
-            if (this.isGoodBrowser) {
-                var selectionEnd = input.selectionEnd, originalLen = val.length;
-                cursorAtEnd = selectionEnd == originalLen;
-                // if handling a new number character: insert it in the right place and calculate the new cursor position
-                if (newNumericChar) {
-                    // replace any selection they may have made with the new char
-                    val = val.substr(0, input.selectionStart) + newNumericChar + val.substring(selectionEnd, originalLen);
-                    // if the cursor was not at the end then calculate it's new pos
-                    if (!cursorAtEnd) {
-                        newCursor = selectionEnd + (val.length - originalLen);
-                    }
-                } else {
-                    // here we're not handling a new char, we're just doing a re-format, but we still need to maintain the cursor position
-                    newCursor = input.selectionStart;
-                }
-            } else if (newNumericChar) {
-                val += newNumericChar;
-            }
-            // update the number and flag
-            this.setNumber(val, addSuffix);
-            // update the cursor position
-            if (this.isGoodBrowser) {
-                // if it was at the end, keep it there
-                if (cursorAtEnd) {
-                    newCursor = this.telInput.val().length;
-                }
-                input.setSelectionRange(newCursor, newCursor);
-            }
-        },
-        // listen for focus and blur
-        _initFocusListeners: function() {
-            var that = this;
-            if (this.options.autoHideDialCode) {
-                // mousedown decides where the cursor goes, so if we're focusing we must preventDefault as we'll be inserting the dial code, and we want the cursor to be at the end no matter where they click
-                this.telInput.on("mousedown" + this.ns, function(e) {
-                    if (!that.telInput.is(":focus") && !that.telInput.val()) {
-                        e.preventDefault();
-                        // but this also cancels the focus, so we must trigger that manually
-                        that.telInput.focus();
-                    }
-                });
-            }
-            this.telInput.on("focus" + this.ns, function() {
-                var value = that.telInput.val();
-                // save this to compare on blur
-                that.telInput.data("focusVal", value);
-                if (that.options.autoHideDialCode) {
-                    // on focus: if empty, insert the dial code for the currently selected flag
-                    if (!value) {
-                        that._updateVal("+" + that.selectedCountryData.dialCode, true);
-                        // after auto-inserting a dial code, if the first key they hit is '+' then assume they are entering a new number, so remove the dial code. use keypress instead of keydown because keydown gets triggered for the shift key (required to hit the + key), and instead of keyup because that shows the new '+' before removing the old one
-                        that.telInput.one("keypress.plus" + that.ns, function(e) {
-                            if (e.which == keys.PLUS) {
-                                // if autoFormat is enabled, this key event will have already have been handled by another keypress listener (hence we need to add the "+"). if disabled, it will be handled after this by a keyup listener (hence no need to add the "+").
-                                var newVal = that.options.autoFormat ? "+" : "";
-                                that.telInput.val(newVal);
-                            }
-                        });
-                        // after tabbing in, make sure the cursor is at the end we must use setTimeout to get outside of the focus handler as it seems the selection happens after that
-                        setTimeout(function() {
-                            var input = that.telInput[0];
-                            if (that.isGoodBrowser) {
-                                var len = that.telInput.val().length;
-                                input.setSelectionRange(len, len);
-                            }
-                        });
-                    }
-                }
-            });
-            this.telInput.on("blur" + this.ns, function() {
-                if (that.options.autoHideDialCode) {
-                    // on blur: if just a dial code then remove it
-                    var value = that.telInput.val(), startsPlus = value.substr(0, 1) == "+";
-                    if (startsPlus) {
-                        var numeric = that._getNumeric(value);
-                        // if just a plus, or if just a dial code
-                        if (!numeric || that.selectedCountryData.dialCode == numeric) {
-                            that.telInput.val("");
-                        }
-                    }
-                    // remove the keypress listener we added on focus
-                    that.telInput.off("keypress.plus" + that.ns);
-                }
-                // manually trigger change event if value has changed
-                if (that.options.autoFormat && that.telInput.val() != that.telInput.data("focusVal")) {
-                    that.telInput.trigger("change");
-                }
-            });
-        },
-        // extract the numeric digits from the given string
-        _getNumeric: function(s) {
-            return s.replace(/\D/g, "");
-        },
-        // show the dropdown
-        _showDropdown: function() {
-            this._setDropdownPosition();
-            // update highlighting and scroll to active list item
-            var activeListItem = this.countryList.children(".active");
-            this._highlightListItem(activeListItem);
-            // show it
-            this.countryList.removeClass("hide");
-            this._scrollTo(activeListItem);
-            // bind all the dropdown-related listeners: mouseover, click, click-off, keydown
-            this._bindDropdownListeners();
-            // update the arrow
-            this.selectedFlagInner.children(".arrow").addClass("up");
-        },
-        // decide where to position dropdown (depends on position within viewport, and scroll)
-        _setDropdownPosition: function() {
-            var inputTop = this.telInput.offset().top, windowTop = $(window).scrollTop(), // dropdownFitsBelow = (dropdownBottom < windowBottom)
-                dropdownFitsBelow = inputTop + this.telInput.outerHeight() + this.dropdownHeight < windowTop + $(window).height(), dropdownFitsAbove = inputTop - this.dropdownHeight > windowTop;
-            // dropdownHeight - 1 for border
-            var cssTop = !dropdownFitsBelow && dropdownFitsAbove ? "-" + (this.dropdownHeight - 1) + "px" : "";
-            this.countryList.css("top", cssTop);
-        },
-        // we only bind dropdown listeners when the dropdown is open
-        _bindDropdownListeners: function() {
-            var that = this;
-            // when mouse over a list item, just highlight that one
-            // we add the class "highlight", so if they hit "enter" we know which one to select
-            this.countryList.on("mouseover" + this.ns, ".country", function(e) {
-                that._highlightListItem($(this));
-            });
-            // listen for country selection
-            this.countryList.on("click" + this.ns, ".country", function(e) {
-                that._selectListItem($(this));
-            });
-            // click off to close
-            // (except when this initial opening click is bubbling up)
-            // we cannot just stopPropagation as it may be needed to close another instance
-            var isOpening = true;
-            $("html").on("click" + this.ns, function(e) {
-                if (!isOpening) {
-                    that._closeDropdown();
-                }
-                isOpening = false;
-            });
-            // listen for up/down scrolling, enter to select, or letters to jump to country name.
-            // use keydown as keypress doesn't fire for non-char keys and we want to catch if they
-            // just hit down and hold it to scroll down (no keyup event).
-            // listen on the document because that's where key events are triggered if no input has focus
-            var query = "", queryTimer = null;
-            $(document).on("keydown" + this.ns, function(e) {
-                // prevent down key from scrolling the whole page,
-                // and enter key from submitting a form etc
-                e.preventDefault();
-                if (e.which == keys.UP || e.which == keys.DOWN) {
-                    // up and down to navigate
-                    that._handleUpDownKey(e.which);
-                } else if (e.which == keys.ENTER) {
-                    // enter to select
-                    that._handleEnterKey();
-                } else if (e.which == keys.ESC) {
-                    // esc to close
-                    that._closeDropdown();
-                } else if (e.which >= keys.A && e.which <= keys.Z || e.which == keys.SPACE) {
-                    // upper case letters (note: keyup/keydown only return upper case letters)
-                    // jump to countries that start with the query string
-                    if (queryTimer) {
-                        clearTimeout(queryTimer);
-                    }
-                    query += String.fromCharCode(e.which);
-                    that._searchForCountry(query);
-                    // if the timer hits 1 second, reset the query
-                    queryTimer = setTimeout(function() {
-                        query = "";
-                    }, 1e3);
-                }
-            });
-        },
-        // highlight the next/prev item in the list (and ensure it is visible)
-        _handleUpDownKey: function(key) {
-            var current = this.countryList.children(".highlight").first();
-            var next = key == keys.UP ? current.prev() : current.next();
-            if (next.length) {
-                // skip the divider
-                if (next.hasClass("divider")) {
-                    next = key == keys.UP ? next.prev() : next.next();
-                }
-                this._highlightListItem(next);
-                this._scrollTo(next);
-            }
-        },
-        // select the currently highlighted item
-        _handleEnterKey: function() {
-            var currentCountry = this.countryList.children(".highlight").first();
-            if (currentCountry.length) {
-                this._selectListItem(currentCountry);
-            }
-        },
-        // find the first list item whose name starts with the query string
-        _searchForCountry: function(query) {
-            for (var i = 0; i < this.countries.length; i++) {
-                if (this._startsWith(this.countries[i].name, query)) {
-                    var listItem = this.countryList.children("[data-country-code=" + this.countries[i].iso2 + "]").not(".preferred");
-                    // update highlighting and scroll
-                    this._highlightListItem(listItem);
-                    this._scrollTo(listItem, true);
-                    break;
-                }
-            }
-        },
-        // check if (uppercase) string a starts with string b
-        _startsWith: function(a, b) {
-            return a.substr(0, b.length).toUpperCase() == b;
-        },
-        // update the input's value to the given val
-        // if autoFormat=true, format it first according to the country-specific formatting rules
-        _updateVal: function(val, addSuffix) {
-            var formatted;
-            if (this.options.autoFormat && window.intlTelInputUtils) {
-                formatted = intlTelInputUtils.formatNumber(val, this.selectedCountryData.iso2, addSuffix);
-                // ensure we dont go over maxlength. we must do this here to truncate any formatting suffix, and also handle paste events
-                var max = this.telInput.attr("maxlength");
-                if (max && formatted.length > max) {
-                    formatted = formatted.substr(0, max);
-                }
-            } else {
-                // no autoFormat, so just insert the original value
-                formatted = val;
-            }
-            this.telInput.val(formatted);
-        },
-        // check if need to select a new flag based on the given number
-        _updateFlagFromNumber: function(number) {
-            // if we're in nationalMode and we're on US/Canada, make sure the number starts with a +1 so _getDialCode will be able to extract the area code
-            // update: if we dont yet have selectedCountryData, but we're here (trying to update the flag from the number), that means we're initialising the plugin with a number that already has a dial code, so fine to ignore this bit
-            if (this.options.nationalMode && this.selectedCountryData && this.selectedCountryData.dialCode == "1" && number.substr(0, 1) != "+") {
-                number = "+1" + number;
-            }
-            // try and extract valid dial code from input
-            var dialCode = this._getDialCode(number);
-            if (dialCode) {
-                // check if one of the matching countries is already selected
-                var countryCodes = this.countryCodes[this._getNumeric(dialCode)], alreadySelected = false;
-                if (this.selectedCountryData) {
-                    for (var i = 0; i < countryCodes.length; i++) {
-                        if (countryCodes[i] == this.selectedCountryData.iso2) {
-                            alreadySelected = true;
-                        }
-                    }
-                }
-                // if a matching country is not already selected (or this is an unknown NANP area code): choose the first in the list
-                if (!alreadySelected || this._isUnknownNanp(number, dialCode)) {
-                    // if using onlyCountries option, countryCodes[0] may be empty, so we must find the first non-empty index
-                    for (var j = 0; j < countryCodes.length; j++) {
-                        if (countryCodes[j]) {
-                            this._selectFlag(countryCodes[j]);
-                            break;
-                        }
-                    }
-                }
-            }
-        },
-        // check if the given number contains an unknown area code from the North American Numbering Plan i.e. the only dialCode that could be extracted was +1 but the actual number's length is >=4
-        _isUnknownNanp: function(number, dialCode) {
-            return dialCode == "+1" && this._getNumeric(number).length >= 4;
-        },
-        // remove highlighting from other list items and highlight the given item
-        _highlightListItem: function(listItem) {
-            this.countryListItems.removeClass("highlight");
-            listItem.addClass("highlight");
-        },
-        // find the country data for the given country code
-        // the ignoreOnlyCountriesOption is only used during init() while parsing the onlyCountries array
-        _getCountryData: function(countryCode, ignoreOnlyCountriesOption, allowFail) {
-            var countryList = ignoreOnlyCountriesOption ? allCountries : this.countries;
-            for (var i = 0; i < countryList.length; i++) {
-                if (countryList[i].iso2 == countryCode) {
-                    return countryList[i];
-                }
-            }
-            if (allowFail) {
-                return null;
-            } else {
-                throw new Error("No country data for '" + countryCode + "'");
-            }
-        },
-        // select the given flag, update the placeholder and the active list item
-        _selectFlag: function(countryCode) {
-            // do this first as it will throw an error and stop if countryCode is invalid
-            this.selectedCountryData = this._getCountryData(countryCode, false, false);
-            this.selectedFlagInner.attr("class", "flag " + countryCode);
-            // update the selected country's title attribute
-            var title = this.selectedCountryData.name + ": +" + this.selectedCountryData.dialCode;
-            this.selectedFlagInner.parent().attr("title", title);
-            // and the input's placeholder
-            this._updatePlaceholder();
-            // update the active list item
-            var listItem = this.countryListItems.children(".flag." + countryCode).first().parent();
-            this.countryListItems.removeClass("active");
-            listItem.addClass("active");
-        },
-        // update the input placeholder to an example number from the currently selected country
-        _updatePlaceholder: function() {
-            if (window.intlTelInputUtils && !this.hadInitialPlaceholder) {
-                var iso2 = this.selectedCountryData.iso2, numberType = this.options.numberType ? intlTelInputUtils.numberType[this.options.numberType] : intlTelInputUtils.numberType.FIXED_LINE, placeholder = intlTelInputUtils.getExampleNumber(iso2, this.options.nationalMode, numberType);
-                this.telInput.attr("placeholder", placeholder);
-            }
-        },
-        // called when the user selects a list item from the dropdown
-        _selectListItem: function(listItem) {
-            // update selected flag and active list item
-            var countryCode = listItem.attr("data-country-code");
-            this._selectFlag(countryCode);
-            this._closeDropdown();
-            this._updateDialCode(listItem.attr("data-dial-code"), true);
-            // always fire the change event as even if nationalMode=true (and we haven't updated the input val), the system as a whole has still changed - see country-sync example. think of it as making a selection from a select element.
-            this.telInput.trigger("change");
-            // focus the input
-            this.telInput.focus();
-        },
-        // close the dropdown and unbind any listeners
-        _closeDropdown: function() {
-            this.countryList.addClass("hide");
-            // update the arrow
-            this.selectedFlagInner.children(".arrow").removeClass("up");
-            // unbind key events
-            $(document).off(this.ns);
-            // unbind click-off-to-close
-            $("html").off(this.ns);
-            // unbind hover and click listeners
-            this.countryList.off(this.ns);
-        },
-        // check if an element is visible within it's container, else scroll until it is
-        _scrollTo: function(element, middle) {
-            var container = this.countryList, containerHeight = container.height(), containerTop = container.offset().top, containerBottom = containerTop + containerHeight, elementHeight = element.outerHeight(), elementTop = element.offset().top, elementBottom = elementTop + elementHeight, newScrollTop = elementTop - containerTop + container.scrollTop(), middleOffset = containerHeight / 2 - elementHeight / 2;
-            if (elementTop < containerTop) {
-                // scroll up
-                if (middle) {
-                    newScrollTop -= middleOffset;
-                }
-                container.scrollTop(newScrollTop);
-            } else if (elementBottom > containerBottom) {
-                // scroll down
-                if (middle) {
-                    newScrollTop += middleOffset;
-                }
-                var heightDifference = containerHeight - elementHeight;
-                container.scrollTop(newScrollTop - heightDifference);
-            }
-        },
-        // replace any existing dial code with the new one (if not in nationalMode)
-        // also we need to know if we're focusing for a couple of reasons e.g. if so, we want to add any formatting suffix, also if the input is empty and we're not in nationalMode, then we want to insert the dial code
-        _updateDialCode: function(newDialCode, focusing) {
-            var inputVal = this.telInput.val(), newNumber;
-            // save having to pass this every time
-            newDialCode = "+" + newDialCode;
-            if (this.options.nationalMode && inputVal.substr(0, 1) != "+") {
-                // if nationalMode, we just want to re-format
-                newNumber = inputVal;
-            } else if (inputVal) {
-                // if the previous number contained a valid dial code, replace it
-                // (if more than just a plus character)
-                var prevDialCode = this._getDialCode(inputVal);
-                if (prevDialCode.length > 1) {
-                    newNumber = inputVal.replace(prevDialCode, newDialCode);
-                } else {
-                    // if the previous number didn't contain a dial code, we should persist it
-                    var existingNumber = inputVal.substr(0, 1) != "+" ? $.trim(inputVal) : "";
-                    newNumber = newDialCode + existingNumber;
-                }
-            } else {
-                newNumber = !this.options.autoHideDialCode || focusing ? newDialCode : "";
-            }
-            this._updateVal(newNumber, focusing);
-        },
-        // try and extract a valid international dial code from a full telephone number
-        // Note: returns the raw string inc plus character and any whitespace/dots etc
-        _getDialCode: function(number) {
-            var dialCode = "";
-            // only interested in international numbers (starting with a plus)
-            if (number.charAt(0) == "+") {
-                var numericChars = "";
-                // iterate over chars
-                for (var i = 0; i < number.length; i++) {
-                    var c = number.charAt(i);
-                    // if char is number
-                    if ($.isNumeric(c)) {
-                        numericChars += c;
-                        // if current numericChars make a valid dial code
-                        if (this.countryCodes[numericChars]) {
-                            // store the actual raw string (useful for matching later)
-                            dialCode = number.substr(0, i + 1);
-                        }
-                        // longest dial code is 4 chars
-                        if (numericChars.length == 4) {
-                            break;
-                        }
-                    }
-                }
-            }
-            return dialCode;
-        },
-        /********************
-         *  PUBLIC METHODS
-         ********************/
-        // remove plugin
-        destroy: function() {
-            // make sure the dropdown is closed (and unbind listeners)
-            this._closeDropdown();
-            // key events, and focus/blur events if autoHideDialCode=true
-            this.telInput.off(this.ns);
-            // click event to open dropdown
-            this.selectedFlagInner.parent().off(this.ns);
-            // label click hack
-            this.telInput.closest("label").off(this.ns);
-            // remove markup
-            var container = this.telInput.parent();
-            container.before(this.telInput).remove();
-        },
-        // format the number to E164
-        getCleanNumber: function() {
-            if (window.intlTelInputUtils) {
-                return intlTelInputUtils.formatNumberE164(this.telInput.val(), this.selectedCountryData.iso2);
-            }
-            return "";
-        },
-        // get the type of the entered number e.g. landline/mobile
-        getNumberType: function() {
-            if (window.intlTelInputUtils) {
-                return intlTelInputUtils.getNumberType(this.telInput.val(), this.selectedCountryData.iso2);
-            }
-            return -99;
-        },
-        // get the country data for the currently selected flag
-        getSelectedCountryData: function() {
-            // if this is undefined, the plugin will return it's instance instead, so in that case an empty object makes more sense
-            return this.selectedCountryData || {};
-        },
-        // get the validation error
-        getValidationError: function() {
-            if (window.intlTelInputUtils) {
-                return intlTelInputUtils.getValidationError(this.telInput.val(), this.selectedCountryData.iso2);
-            }
-            return -99;
-        },
-        // validate the input val - assumes the global function isValidNumber (from utilsScript)
-        isValidNumber: function() {
-            var val = $.trim(this.telInput.val()), countryCode = this.options.nationalMode ? this.selectedCountryData.iso2 : "", // libphonenumber allows alpha chars, but in order to allow that, we'd need a method to retrieve the processed number, with letters replaced with numbers
-                containsAlpha = /[a-zA-Z]/.test(val);
-            if (!containsAlpha && window.intlTelInputUtils) {
-                return intlTelInputUtils.isValidNumber(val, countryCode);
-            }
-            return false;
-        },
-        // load the utils script
-        loadUtils: function(path) {
-            var utilsScript = path || this.options.utilsScript;
-            if (!$.fn[pluginName].loadedUtilsScript && utilsScript) {
-                // don't do this twice! (dont just check if the global intlTelInputUtils exists as if init plugin multiple times in quick succession, it may not have finished loading yet)
-                $.fn[pluginName].loadedUtilsScript = true;
-                // dont use $.getScript as it prevents caching
-                $.ajax({
-                    url: utilsScript,
-                    success: function() {
-                        // tell all instances the utils are ready
-                        $(".intl-tel-input input").intlTelInput("utilsLoaded");
-                    },
-                    dataType: "script",
-                    cache: true
-                });
-            }
-        },
-        // update the selected flag, and update the input val accordingly
-        selectCountry: function(countryCode) {
-            // check if already selected
-            if (!this.selectedFlagInner.hasClass(countryCode)) {
-                this._selectFlag(countryCode);
-                this._updateDialCode(this.selectedCountryData.dialCode, false);
-            }
-        },
-        // set the input value and update the flag
-        setNumber: function(number, addSuffix) {
-            // ensure starts with plus
-            if (!this.options.nationalMode && number.substr(0, 1) != "+") {
-                number = "+" + number;
-            }
-            // we must update the flag first, which updates this.selectedCountryData, which is used later for formatting the number before displaying it
-            this._updateFlagFromNumber(number);
-            this._updateVal(number, addSuffix);
-        },
-        // this is called when the utils are ready
-        utilsLoaded: function() {
-            // if autoFormat is enabled and there's an initial value in the input, then format it
-            if (this.options.autoFormat && this.telInput.val()) {
-                this._updateVal(this.telInput.val());
-            }
-            this._updatePlaceholder();
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: transition.js v3.3.7
+ * http://getbootstrap.com/javascript/#transitions
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+    // ============================================================
+
+    function transitionEnd() {
+        var el = document.createElement('bootstrap')
+
+        var transEndEventNames = {
+            WebkitTransition: 'webkitTransitionEnd',
+            MozTransition: 'transitionend',
+            OTransition: 'oTransitionEnd otransitionend',
+            transition: 'transitionend'
         }
-    };
-    // adapted to allow public functions
-    // using https://github.com/jquery-boilerplate/jquery-boilerplate/wiki/Extending-jQuery-Boilerplate
-    $.fn[pluginName] = function(options) {
-        var args = arguments;
-        // Is the first parameter an object (options), or was omitted,
-        // instantiate a new instance of the plugin.
-        if (options === undefined || typeof options === "object") {
-            return this.each(function() {
-                if (!$.data(this, "plugin_" + pluginName)) {
-                    $.data(this, "plugin_" + pluginName, new Plugin(this, options));
-                }
-            });
-        } else if (typeof options === "string" && options[0] !== "_" && options !== "init") {
-            // If the first parameter is a string and it doesn't start
-            // with an underscore or "contains" the `init`-function,
-            // treat this as a call to a public method.
-            // Cache the method call to make it possible to return a value
-            var returns;
-            this.each(function() {
-                var instance = $.data(this, "plugin_" + pluginName);
-                // Tests that there's already a plugin-instance
-                // and checks that the requested public method exists
-                if (instance instanceof Plugin && typeof instance[options] === "function") {
-                    // Call the method of our plugin instance,
-                    // and pass it the supplied arguments.
-                    returns = instance[options].apply(instance, Array.prototype.slice.call(args, 1));
-                }
-                // Allow instances to be destroyed via the 'destroy' method
-                if (options === "destroy") {
-                    $.data(this, "plugin_" + pluginName, null);
-                }
-            });
-            // If the earlier cached method gives a value back return the value,
-            // otherwise return this to preserve chainability.
-            return returns !== undefined ? returns : this;
+
+        for (var name in transEndEventNames) {
+            if (el.style[name] !== undefined) {
+                return {end: transEndEventNames[name]}
+            }
         }
-    };
-    /********************
-     *  STATIC METHODS
-     ********************/
-    // get the country data object
-    $.fn[pluginName].getCountryData = function() {
-        return allCountries;
-    };
-    // set the country data object
-    $.fn[pluginName].setCountryData = function(obj) {
-        allCountries = obj;
-    };
-    // Tell JSHint to ignore this warning: "character may get silently deleted by one or more browsers"
-    // jshint -W100
-    // Array of country objects for the flag dropdown.
-    // Each contains a name, country code (ISO 3166-1 alpha-2) and dial code.
-    // Originally from https://github.com/mledoze/countries
-    // then modified using the following JavaScript (NOW OUT OF DATE):
-    /*
-     var result = [];
-     _.each(countries, function(c) {
-     // ignore countries without a dial code
-     if (c.callingCode[0].length) {
-     result.push({
-     // var locals contains country names with localised versions in brackets
-     n: _.findWhere(locals, {
-     countryCode: c.cca2
-     }).name,
-     i: c.cca2.toLowerCase(),
-     d: c.callingCode[0]
-     });
-     }
-     });
-     JSON.stringify(result);
-     */
-    // then with a couple of manual re-arrangements to be alphabetical
-    // then changed Kazakhstan from +76 to +7
-    // and Vatican City from +379 to +39 (see issue 50)
-    // and Caribean Netherlands from +5997 to +599
-    // and Curacao from +5999 to +599
-    // Removed: Åland Islands, Christmas Island, Cocos Islands, Guernsey, Isle of Man, Jersey, Kosovo, Mayotte, Pitcairn Islands, South Georgia, Svalbard, Western Sahara
-    // Update: converted objects to arrays to save bytes!
-    // Update: added "priority" for countries with the same dialCode as others
-    // Update: added array of area codes for countries with the same dialCode as others
-    // So each country array has the following information:
-    // [
-    //    Country name,
-    //    iso2 code,
-    //    International dial code,
-    //    Order (if >1 country with same dial code),
-    //    Area codes (if >1 country with same dial code)
-    // ]
-    var allCountries = [ [ "Afghanistan (‫افغانستان‬‎)", "af", "93" ], [ "Albania (Shqipëri)", "al", "355" ], [ "Algeria (‫الجزائر‬‎)", "dz", "213" ], [ "American Samoa", "as", "1684" ], [ "Andorra", "ad", "376" ], [ "Angola", "ao", "244" ], [ "Anguilla", "ai", "1264" ], [ "Antigua and Barbuda", "ag", "1268" ], [ "Argentina", "ar", "54" ], [ "Armenia (Հայաստան)", "am", "374" ], [ "Aruba", "aw", "297" ], [ "Australia", "au", "61" ], [ "Austria (Österreich)", "at", "43" ], [ "Azerbaijan (Azərbaycan)", "az", "994" ], [ "Bahamas", "bs", "1242" ], [ "Bahrain (‫البحرين‬‎)", "bh", "973" ], [ "Bangladesh (বাংলাদেশ)", "bd", "880" ], [ "Barbados", "bb", "1246" ], [ "Belarus (Беларусь)", "by", "375" ], [ "Belgium (België)", "be", "32" ], [ "Belize", "bz", "501" ], [ "Benin (Bénin)", "bj", "229" ], [ "Bermuda", "bm", "1441" ], [ "Bhutan (འབྲུག)", "bt", "975" ], [ "Bolivia", "bo", "591" ], [ "Bosnia and Herzegovina (Босна и Херцеговина)", "ba", "387" ], [ "Botswana", "bw", "267" ], [ "Brazil (Brasil)", "br", "55" ], [ "British Indian Ocean Territory", "io", "246" ], [ "British Virgin Islands", "vg", "1284" ], [ "Brunei", "bn", "673" ], [ "Bulgaria (България)", "bg", "359" ], [ "Burkina Faso", "bf", "226" ], [ "Burundi (Uburundi)", "bi", "257" ], [ "Cambodia (កម្ពុជា)", "kh", "855" ], [ "Cameroon (Cameroun)", "cm", "237" ], [ "Canada", "ca", "1", 1, [ "204", "236", "249", "250", "289", "306", "343", "365", "387", "403", "416", "418", "431", "437", "438", "450", "506", "514", "519", "548", "579", "581", "587", "604", "613", "639", "647", "672", "705", "709", "742", "778", "780", "782", "807", "819", "825", "867", "873", "902", "905" ] ], [ "Cape Verde (Kabu Verdi)", "cv", "238" ], [ "Caribbean Netherlands", "bq", "599", 1 ], [ "Cayman Islands", "ky", "1345" ], [ "Central African Republic (République centrafricaine)", "cf", "236" ], [ "Chad (Tchad)", "td", "235" ], [ "Chile", "cl", "56" ], [ "China (中国)", "cn", "86" ], [ "Colombia", "co", "57" ], [ "Comoros (‫جزر القمر‬‎)", "km", "269" ], [ "Congo (DRC) (Jamhuri ya Kidemokrasia ya Kongo)", "cd", "243" ], [ "Congo (Republic) (Congo-Brazzaville)", "cg", "242" ], [ "Cook Islands", "ck", "682" ], [ "Costa Rica", "cr", "506" ], [ "Côte d’Ivoire", "ci", "225" ], [ "Croatia (Hrvatska)", "hr", "385" ], [ "Cuba", "cu", "53" ], [ "Curaçao", "cw", "599", 0 ], [ "Cyprus (Κύπρος)", "cy", "357" ], [ "Czech Republic (Česká republika)", "cz", "420" ], [ "Denmark (Danmark)", "dk", "45" ], [ "Djibouti", "dj", "253" ], [ "Dominica", "dm", "1767" ], [ "Dominican Republic (República Dominicana)", "do", "1", 2, [ "809", "829", "849" ] ], [ "Ecuador", "ec", "593" ], [ "Egypt (‫مصر‬‎)", "eg", "20" ], [ "El Salvador", "sv", "503" ], [ "Equatorial Guinea (Guinea Ecuatorial)", "gq", "240" ], [ "Eritrea", "er", "291" ], [ "Estonia (Eesti)", "ee", "372" ], [ "Ethiopia", "et", "251" ], [ "Falkland Islands (Islas Malvinas)", "fk", "500" ], [ "Faroe Islands (Føroyar)", "fo", "298" ], [ "Fiji", "fj", "679" ], [ "Finland (Suomi)", "fi", "358" ], [ "France", "fr", "33" ], [ "French Guiana (Guyane française)", "gf", "594" ], [ "French Polynesia (Polynésie française)", "pf", "689" ], [ "Gabon", "ga", "241" ], [ "Gambia", "gm", "220" ], [ "Georgia (საქართველო)", "ge", "995" ], [ "Germany (Deutschland)", "de", "49" ], [ "Ghana (Gaana)", "gh", "233" ], [ "Gibraltar", "gi", "350" ], [ "Greece (Ελλάδα)", "gr", "30" ], [ "Greenland (Kalaallit Nunaat)", "gl", "299" ], [ "Grenada", "gd", "1473" ], [ "Guadeloupe", "gp", "590", 0 ], [ "Guam", "gu", "1671" ], [ "Guatemala", "gt", "502" ], [ "Guinea (Guinée)", "gn", "224" ], [ "Guinea-Bissau (Guiné Bissau)", "gw", "245" ], [ "Guyana", "gy", "592" ], [ "Haiti", "ht", "509" ], [ "Honduras", "hn", "504" ], [ "Hong Kong (香港)", "hk", "852" ], [ "Hungary (Magyarország)", "hu", "36" ], [ "Iceland (Ísland)", "is", "354" ], [ "India (भारत)", "in", "91" ], [ "Indonesia", "id", "62" ], [ "Iran (‫ایران‬‎)", "ir", "98" ], [ "Iraq (‫العراق‬‎)", "iq", "964" ], [ "Ireland", "ie", "353" ], [ "Israel (‫ישראל‬‎)", "il", "972" ], [ "Italy (Italia)", "it", "39", 0 ], [ "Jamaica", "jm", "1876" ], [ "Japan (日本)", "jp", "81" ], [ "Jordan (‫الأردن‬‎)", "jo", "962" ], [ "Kazakhstan (Казахстан)", "kz", "7", 1 ], [ "Kenya", "ke", "254" ], [ "Kiribati", "ki", "686" ], [ "Kuwait (‫الكويت‬‎)", "kw", "965" ], [ "Kyrgyzstan (Кыргызстан)", "kg", "996" ], [ "Laos (ລາວ)", "la", "856" ], [ "Latvia (Latvija)", "lv", "371" ], [ "Lebanon (‫لبنان‬‎)", "lb", "961" ], [ "Lesotho", "ls", "266" ], [ "Liberia", "lr", "231" ], [ "Libya (‫ليبيا‬‎)", "ly", "218" ], [ "Liechtenstein", "li", "423" ], [ "Lithuania (Lietuva)", "lt", "370" ], [ "Luxembourg", "lu", "352" ], [ "Macau (澳門)", "mo", "853" ], [ "Macedonia (FYROM) (Македонија)", "mk", "389" ], [ "Madagascar (Madagasikara)", "mg", "261" ], [ "Malawi", "mw", "265" ], [ "Malaysia", "my", "60" ], [ "Maldives", "mv", "960" ], [ "Mali", "ml", "223" ], [ "Malta", "mt", "356" ], [ "Marshall Islands", "mh", "692" ], [ "Martinique", "mq", "596" ], [ "Mauritania (‫موريتانيا‬‎)", "mr", "222" ], [ "Mauritius (Moris)", "mu", "230" ], [ "Mexico (México)", "mx", "52" ], [ "Micronesia", "fm", "691" ], [ "Moldova (Republica Moldova)", "md", "373" ], [ "Monaco", "mc", "377" ], [ "Mongolia (Монгол)", "mn", "976" ], [ "Montenegro (Crna Gora)", "me", "382" ], [ "Montserrat", "ms", "1664" ], [ "Morocco (‫المغرب‬‎)", "ma", "212" ], [ "Mozambique (Moçambique)", "mz", "258" ], [ "Myanmar (Burma) (မြန်မာ)", "mm", "95" ], [ "Namibia (Namibië)", "na", "264" ], [ "Nauru", "nr", "674" ], [ "Nepal (नेपाल)", "np", "977" ], [ "Netherlands (Nederland)", "nl", "31" ], [ "New Caledonia (Nouvelle-Calédonie)", "nc", "687" ], [ "New Zealand", "nz", "64" ], [ "Nicaragua", "ni", "505" ], [ "Niger (Nijar)", "ne", "227" ], [ "Nigeria", "ng", "234" ], [ "Niue", "nu", "683" ], [ "Norfolk Island", "nf", "672" ], [ "North Korea (조선 민주주의 인민 공화국)", "kp", "850" ], [ "Northern Mariana Islands", "mp", "1670" ], [ "Norway (Norge)", "no", "47" ], [ "Oman (‫عُمان‬‎)", "om", "968" ], [ "Pakistan (‫پاکستان‬‎)", "pk", "92" ], [ "Palau", "pw", "680" ], [ "Palestine (‫فلسطين‬‎)", "ps", "970" ], [ "Panama (Panamá)", "pa", "507" ], [ "Papua New Guinea", "pg", "675" ], [ "Paraguay", "py", "595" ], [ "Peru (Perú)", "pe", "51" ], [ "Philippines", "ph", "63" ], [ "Poland (Polska)", "pl", "48" ], [ "Portugal", "pt", "351" ], [ "Puerto Rico", "pr", "1", 3, [ "787", "939" ] ], [ "Qatar (‫قطر‬‎)", "qa", "974" ], [ "Réunion (La Réunion)", "re", "262" ], [ "Romania (România)", "ro", "40" ], [ "Russia (Россия)", "ru", "7", 0 ], [ "Rwanda", "rw", "250" ], [ "Saint Barthélemy (Saint-Barthélemy)", "bl", "590", 1 ], [ "Saint Helena", "sh", "290" ], [ "Saint Kitts and Nevis", "kn", "1869" ], [ "Saint Lucia", "lc", "1758" ], [ "Saint Martin (Saint-Martin (partie française))", "mf", "590", 2 ], [ "Saint Pierre and Miquelon (Saint-Pierre-et-Miquelon)", "pm", "508" ], [ "Saint Vincent and the Grenadines", "vc", "1784" ], [ "Samoa", "ws", "685" ], [ "San Marino", "sm", "378" ], [ "São Tomé and Príncipe (São Tomé e Príncipe)", "st", "239" ], [ "Saudi Arabia (‫المملكة العربية السعودية‬‎)", "sa", "966" ], [ "Senegal (Sénégal)", "sn", "221" ], [ "Serbia (Србија)", "rs", "381" ], [ "Seychelles", "sc", "248" ], [ "Sierra Leone", "sl", "232" ], [ "Singapore", "sg", "65" ], [ "Sint Maarten", "sx", "1721" ], [ "Slovakia (Slovensko)", "sk", "421" ], [ "Slovenia (Slovenija)", "si", "386" ], [ "Solomon Islands", "sb", "677" ], [ "Somalia (Soomaaliya)", "so", "252" ], [ "South Africa", "za", "27" ], [ "South Korea (대한민국)", "kr", "82" ], [ "South Sudan (‫جنوب السودان‬‎)", "ss", "211" ], [ "Spain (España)", "es", "34" ], [ "Sri Lanka (ශ්‍රී ලංකාව)", "lk", "94" ], [ "Sudan (‫السودان‬‎)", "sd", "249" ], [ "Suriname", "sr", "597" ], [ "Swaziland", "sz", "268" ], [ "Sweden (Sverige)", "se", "46" ], [ "Switzerland (Schweiz)", "ch", "41" ], [ "Syria (‫سوريا‬‎)", "sy", "963" ], [ "Taiwan (台灣)", "tw", "886" ], [ "Tajikistan", "tj", "992" ], [ "Tanzania", "tz", "255" ], [ "Thailand (ไทย)", "th", "66" ], [ "Timor-Leste", "tl", "670" ], [ "Togo", "tg", "228" ], [ "Tokelau", "tk", "690" ], [ "Tonga", "to", "676" ], [ "Trinidad and Tobago", "tt", "1868" ], [ "Tunisia (‫تونس‬‎)", "tn", "216" ], [ "Turkey (Türkiye)", "tr", "90" ], [ "Turkmenistan", "tm", "993" ], [ "Turks and Caicos Islands", "tc", "1649" ], [ "Tuvalu", "tv", "688" ], [ "U.S. Virgin Islands", "vi", "1340" ], [ "Uganda", "ug", "256" ], [ "Ukraine (Україна)", "ua", "380" ], [ "United Arab Emirates (‫الإمارات العربية المتحدة‬‎)", "ae", "971" ], [ "United Kingdom", "gb", "44" ], [ "United States", "us", "1", 0 ], [ "Uruguay", "uy", "598" ], [ "Uzbekistan (Oʻzbekiston)", "uz", "998" ], [ "Vanuatu", "vu", "678" ], [ "Vatican City (Città del Vaticano)", "va", "39", 1 ], [ "Venezuela", "ve", "58" ], [ "Vietnam (Việt Nam)", "vn", "84" ], [ "Wallis and Futuna", "wf", "681" ], [ "Yemen (‫اليمن‬‎)", "ye", "967" ], [ "Zambia", "zm", "260" ], [ "Zimbabwe", "zw", "263" ] ];
-    // loop over all of the countries above
-    for (var i = 0; i < allCountries.length; i++) {
-        var c = allCountries[i];
-        allCountries[i] = {
-            name: c[0],
-            iso2: c[1],
-            dialCode: c[2],
-            priority: c[3] || 0,
-            areaCodes: c[4] || null
-        };
+
+        return false // explicit for ie8 (  ._.)
     }
-});
+
+    // http://blog.alexmaccaw.com/css-transitions
+    $.fn.emulateTransitionEnd = function (duration) {
+        var called = false
+        var $el = this
+        $(this).one('bsTransitionEnd', function () {
+            called = true
+        })
+        var callback = function () {
+            if (!called) $($el).trigger($.support.transition.end)
+        }
+        setTimeout(callback, duration)
+        return this
+    }
+
+    $(function () {
+        $.support.transition = transitionEnd()
+
+        if (!$.support.transition) return
+
+        $.event.special.bsTransitionEnd = {
+            bindType: $.support.transition.end,
+            delegateType: $.support.transition.end,
+            handle: function (e) {
+                if ($(e.target).is(this)) return e.handleObj.handler.apply(this, arguments)
+            }
+        }
+    })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: alert.js v3.3.7
+ * http://getbootstrap.com/javascript/#alerts
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // ALERT CLASS DEFINITION
+    // ======================
+
+    var dismiss = '[data-dismiss="alert"]'
+    var Alert = function (el) {
+        $(el).on('click', dismiss, this.close)
+    }
+
+    Alert.VERSION = '3.3.7'
+
+    Alert.TRANSITION_DURATION = 150
+
+    Alert.prototype.close = function (e) {
+        var $this = $(this)
+        var selector = $this.attr('data-target')
+
+        if (!selector) {
+            selector = $this.attr('href')
+            selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+        }
+
+        var $parent = $(selector === '#' ? [] : selector)
+
+        if (e) e.preventDefault()
+
+        if (!$parent.length) {
+            $parent = $this.closest('.alert')
+        }
+
+        $parent.trigger(e = $.Event('close.bs.alert'))
+
+        if (e.isDefaultPrevented()) return
+
+        $parent.removeClass('in')
+
+        function removeElement() {
+            // detach from parent, fire event then clean up data
+            $parent.detach().trigger('closed.bs.alert').remove()
+        }
+
+        $.support.transition && $parent.hasClass('fade') ?
+            $parent
+                .one('bsTransitionEnd', removeElement)
+                .emulateTransitionEnd(Alert.TRANSITION_DURATION) :
+            removeElement()
+    }
+
+
+    // ALERT PLUGIN DEFINITION
+    // =======================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.alert')
+
+            if (!data) $this.data('bs.alert', (data = new Alert(this)))
+            if (typeof option == 'string') data[option].call($this)
+        })
+    }
+
+    var old = $.fn.alert
+
+    $.fn.alert = Plugin
+    $.fn.alert.Constructor = Alert
+
+
+    // ALERT NO CONFLICT
+    // =================
+
+    $.fn.alert.noConflict = function () {
+        $.fn.alert = old
+        return this
+    }
+
+
+    // ALERT DATA-API
+    // ==============
+
+    $(document).on('click.bs.alert.data-api', dismiss, Alert.prototype.close)
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: button.js v3.3.7
+ * http://getbootstrap.com/javascript/#buttons
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // BUTTON PUBLIC CLASS DEFINITION
+    // ==============================
+
+    var Button = function (element, options) {
+        this.$element = $(element)
+        this.options = $.extend({}, Button.DEFAULTS, options)
+        this.isLoading = false
+    }
+
+    Button.VERSION = '3.3.7'
+
+    Button.DEFAULTS = {
+        loadingText: 'loading...'
+    }
+
+    Button.prototype.setState = function (state) {
+        var d = 'disabled'
+        var $el = this.$element
+        var val = $el.is('input') ? 'val' : 'html'
+        var data = $el.data()
+
+        state += 'Text'
+
+        if (data.resetText == null) $el.data('resetText', $el[val]())
+
+        // push to event loop to allow forms to submit
+        setTimeout($.proxy(function () {
+            $el[val](data[state] == null ? this.options[state] : data[state])
+
+            if (state == 'loadingText') {
+                this.isLoading = true
+                $el.addClass(d).attr(d, d).prop(d, true)
+            } else if (this.isLoading) {
+                this.isLoading = false
+                $el.removeClass(d).removeAttr(d).prop(d, false)
+            }
+        }, this), 0)
+    }
+
+    Button.prototype.toggle = function () {
+        var changed = true
+        var $parent = this.$element.closest('[data-toggle="buttons"]')
+
+        if ($parent.length) {
+            var $input = this.$element.find('input')
+            if ($input.prop('type') == 'radio') {
+                if ($input.prop('checked')) changed = false
+                $parent.find('.active').removeClass('active')
+                this.$element.addClass('active')
+            } else if ($input.prop('type') == 'checkbox') {
+                if (($input.prop('checked')) !== this.$element.hasClass('active')) changed = false
+                this.$element.toggleClass('active')
+            }
+            $input.prop('checked', this.$element.hasClass('active'))
+            if (changed) $input.trigger('change')
+        } else {
+            this.$element.attr('aria-pressed', !this.$element.hasClass('active'))
+            this.$element.toggleClass('active')
+        }
+    }
+
+
+    // BUTTON PLUGIN DEFINITION
+    // ========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.button')
+            var options = typeof option == 'object' && option
+
+            if (!data) $this.data('bs.button', (data = new Button(this, options)))
+
+            if (option == 'toggle') data.toggle()
+            else if (option) data.setState(option)
+        })
+    }
+
+    var old = $.fn.button
+
+    $.fn.button = Plugin
+    $.fn.button.Constructor = Button
+
+
+    // BUTTON NO CONFLICT
+    // ==================
+
+    $.fn.button.noConflict = function () {
+        $.fn.button = old
+        return this
+    }
+
+
+    // BUTTON DATA-API
+    // ===============
+
+    $(document)
+        .on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+            var $btn = $(e.target).closest('.btn')
+            Plugin.call($btn, 'toggle')
+            if (!($(e.target).is('input[type="radio"], input[type="checkbox"]'))) {
+                // Prevent double click on radios, and the double selections (so cancellation) on checkboxes
+                e.preventDefault()
+                // The target component still receive the focus
+                if ($btn.is('input,button')) $btn.trigger('focus')
+                else $btn.find('input:visible,button:visible').first().trigger('focus')
+            }
+        })
+        .on('focus.bs.button.data-api blur.bs.button.data-api', '[data-toggle^="button"]', function (e) {
+            $(e.target).closest('.btn').toggleClass('focus', /^focus(in)?$/.test(e.type))
+        })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: carousel.js v3.3.7
+ * http://getbootstrap.com/javascript/#carousel
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // CAROUSEL CLASS DEFINITION
+    // =========================
+
+    var Carousel = function (element, options) {
+        this.$element = $(element)
+        this.$indicators = this.$element.find('.carousel-indicators')
+        this.options = options
+        this.paused = null
+        this.sliding = null
+        this.interval = null
+        this.$active = null
+        this.$items = null
+
+        this.options.keyboard && this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this))
+
+        this.options.pause == 'hover' && !('ontouchstart' in document.documentElement) && this.$element
+            .on('mouseenter.bs.carousel', $.proxy(this.pause, this))
+            .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
+    }
+
+    Carousel.VERSION = '3.3.7'
+
+    Carousel.TRANSITION_DURATION = 600
+
+    Carousel.DEFAULTS = {
+        interval: 5000,
+        pause: 'hover',
+        wrap: true,
+        keyboard: true
+    }
+
+    Carousel.prototype.keydown = function (e) {
+        if (/input|textarea/i.test(e.target.tagName)) return
+        switch (e.which) {
+            case 37:
+                this.prev();
+                break
+            case 39:
+                this.next();
+                break
+            default:
+                return
+        }
+
+        e.preventDefault()
+    }
+
+    Carousel.prototype.cycle = function (e) {
+        e || (this.paused = false)
+
+        this.interval && clearInterval(this.interval)
+
+        this.options.interval
+        && !this.paused
+        && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
+
+        return this
+    }
+
+    Carousel.prototype.getItemIndex = function (item) {
+        this.$items = item.parent().children('.item')
+        return this.$items.index(item || this.$active)
+    }
+
+    Carousel.prototype.getItemForDirection = function (direction, active) {
+        var activeIndex = this.getItemIndex(active)
+        var willWrap = (direction == 'prev' && activeIndex === 0)
+            || (direction == 'next' && activeIndex == (this.$items.length - 1))
+        if (willWrap && !this.options.wrap) return active
+        var delta = direction == 'prev' ? -1 : 1
+        var itemIndex = (activeIndex + delta) % this.$items.length
+        return this.$items.eq(itemIndex)
+    }
+
+    Carousel.prototype.to = function (pos) {
+        var that = this
+        var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'))
+
+        if (pos > (this.$items.length - 1) || pos < 0) return
+
+        if (this.sliding) return this.$element.one('slid.bs.carousel', function () {
+            that.to(pos)
+        }) // yes, "slid"
+        if (activeIndex == pos) return this.pause().cycle()
+
+        return this.slide(pos > activeIndex ? 'next' : 'prev', this.$items.eq(pos))
+    }
+
+    Carousel.prototype.pause = function (e) {
+        e || (this.paused = true)
+
+        if (this.$element.find('.next, .prev').length && $.support.transition) {
+            this.$element.trigger($.support.transition.end)
+            this.cycle(true)
+        }
+
+        this.interval = clearInterval(this.interval)
+
+        return this
+    }
+
+    Carousel.prototype.next = function () {
+        if (this.sliding) return
+        return this.slide('next')
+    }
+
+    Carousel.prototype.prev = function () {
+        if (this.sliding) return
+        return this.slide('prev')
+    }
+
+    Carousel.prototype.slide = function (type, next) {
+        var $active = this.$element.find('.item.active')
+        var $next = next || this.getItemForDirection(type, $active)
+        var isCycling = this.interval
+        var direction = type == 'next' ? 'left' : 'right'
+        var that = this
+
+        if ($next.hasClass('active')) return (this.sliding = false)
+
+        var relatedTarget = $next[0]
+        var slideEvent = $.Event('slide.bs.carousel', {
+            relatedTarget: relatedTarget,
+            direction: direction
+        })
+        this.$element.trigger(slideEvent)
+        if (slideEvent.isDefaultPrevented()) return
+
+        this.sliding = true
+
+        isCycling && this.pause()
+
+        if (this.$indicators.length) {
+            this.$indicators.find('.active').removeClass('active')
+            var $nextIndicator = $(this.$indicators.children()[this.getItemIndex($next)])
+            $nextIndicator && $nextIndicator.addClass('active')
+        }
+
+        var slidEvent = $.Event('slid.bs.carousel', {relatedTarget: relatedTarget, direction: direction}) // yes, "slid"
+        if ($.support.transition && this.$element.hasClass('slide')) {
+            $next.addClass(type)
+            $next[0].offsetWidth // force reflow
+            $active.addClass(direction)
+            $next.addClass(direction)
+            $active
+                .one('bsTransitionEnd', function () {
+                    $next.removeClass([type, direction].join(' ')).addClass('active')
+                    $active.removeClass(['active', direction].join(' '))
+                    that.sliding = false
+                    setTimeout(function () {
+                        that.$element.trigger(slidEvent)
+                    }, 0)
+                })
+                .emulateTransitionEnd(Carousel.TRANSITION_DURATION)
+        } else {
+            $active.removeClass('active')
+            $next.addClass('active')
+            this.sliding = false
+            this.$element.trigger(slidEvent)
+        }
+
+        isCycling && this.cycle()
+
+        return this
+    }
+
+
+    // CAROUSEL PLUGIN DEFINITION
+    // ==========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.carousel')
+            var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'object' && option)
+            var action = typeof option == 'string' ? option : options.slide
+
+            if (!data) $this.data('bs.carousel', (data = new Carousel(this, options)))
+            if (typeof option == 'number') data.to(option)
+            else if (action) data[action]()
+            else if (options.interval) data.pause().cycle()
+        })
+    }
+
+    var old = $.fn.carousel
+
+    $.fn.carousel = Plugin
+    $.fn.carousel.Constructor = Carousel
+
+
+    // CAROUSEL NO CONFLICT
+    // ====================
+
+    $.fn.carousel.noConflict = function () {
+        $.fn.carousel = old
+        return this
+    }
+
+
+    // CAROUSEL DATA-API
+    // =================
+
+    var clickHandler = function (e) {
+        var href
+        var $this = $(this)
+        var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
+        if (!$target.hasClass('carousel')) return
+        var options = $.extend({}, $target.data(), $this.data())
+        var slideIndex = $this.attr('data-slide-to')
+        if (slideIndex) options.interval = false
+
+        Plugin.call($target, options)
+
+        if (slideIndex) {
+            $target.data('bs.carousel').to(slideIndex)
+        }
+
+        e.preventDefault()
+    }
+
+    $(document)
+        .on('click.bs.carousel.data-api', '[data-slide]', clickHandler)
+        .on('click.bs.carousel.data-api', '[data-slide-to]', clickHandler)
+
+    $(window).on('load', function () {
+        $('[data-ride="carousel"]').each(function () {
+            var $carousel = $(this)
+            Plugin.call($carousel, $carousel.data())
+        })
+    })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: collapse.js v3.3.7
+ * http://getbootstrap.com/javascript/#collapse
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+/* jshint latedef: false */
+
++function ($) {
+    'use strict';
+
+    // COLLAPSE PUBLIC CLASS DEFINITION
+    // ================================
+
+    var Collapse = function (element, options) {
+        this.$element = $(element)
+        this.options = $.extend({}, Collapse.DEFAULTS, options)
+        this.$trigger = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
+            '[data-toggle="collapse"][data-target="#' + element.id + '"]')
+        this.transitioning = null
+
+        if (this.options.parent) {
+            this.$parent = this.getParent()
+        } else {
+            this.addAriaAndCollapsedClass(this.$element, this.$trigger)
+        }
+
+        if (this.options.toggle) this.toggle()
+    }
+
+    Collapse.VERSION = '3.3.7'
+
+    Collapse.TRANSITION_DURATION = 350
+
+    Collapse.DEFAULTS = {
+        toggle: true
+    }
+
+    Collapse.prototype.dimension = function () {
+        var hasWidth = this.$element.hasClass('width')
+        return hasWidth ? 'width' : 'height'
+    }
+
+    Collapse.prototype.show = function () {
+        if (this.transitioning || this.$element.hasClass('in')) return
+
+        var activesData
+        var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
+
+        if (actives && actives.length) {
+            activesData = actives.data('bs.collapse')
+            if (activesData && activesData.transitioning) return
+        }
+
+        var startEvent = $.Event('show.bs.collapse')
+        this.$element.trigger(startEvent)
+        if (startEvent.isDefaultPrevented()) return
+
+        if (actives && actives.length) {
+            Plugin.call(actives, 'hide')
+            activesData || actives.data('bs.collapse', null)
+        }
+
+        var dimension = this.dimension()
+
+        this.$element
+            .removeClass('collapse')
+            .addClass('collapsing')[dimension](0)
+            .attr('aria-expanded', true)
+
+        this.$trigger
+            .removeClass('collapsed')
+            .attr('aria-expanded', true)
+
+        this.transitioning = 1
+
+        var complete = function () {
+            this.$element
+                .removeClass('collapsing')
+                .addClass('collapse in')[dimension]('')
+            this.transitioning = 0
+            this.$element
+                .trigger('shown.bs.collapse')
+        }
+
+        if (!$.support.transition) return complete.call(this)
+
+        var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+
+        this.$element
+            .one('bsTransitionEnd', $.proxy(complete, this))
+            .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
+    }
+
+    Collapse.prototype.hide = function () {
+        if (this.transitioning || !this.$element.hasClass('in')) return
+
+        var startEvent = $.Event('hide.bs.collapse')
+        this.$element.trigger(startEvent)
+        if (startEvent.isDefaultPrevented()) return
+
+        var dimension = this.dimension()
+
+        this.$element[dimension](this.$element[dimension]())[0].offsetHeight
+
+        this.$element
+            .addClass('collapsing')
+            .removeClass('collapse in')
+            .attr('aria-expanded', false)
+
+        this.$trigger
+            .addClass('collapsed')
+            .attr('aria-expanded', false)
+
+        this.transitioning = 1
+
+        var complete = function () {
+            this.transitioning = 0
+            this.$element
+                .removeClass('collapsing')
+                .addClass('collapse')
+                .trigger('hidden.bs.collapse')
+        }
+
+        if (!$.support.transition) return complete.call(this)
+
+        this.$element
+            [dimension](0)
+            .one('bsTransitionEnd', $.proxy(complete, this))
+            .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
+    }
+
+    Collapse.prototype.toggle = function () {
+        this[this.$element.hasClass('in') ? 'hide' : 'show']()
+    }
+
+    Collapse.prototype.getParent = function () {
+        return $(this.options.parent)
+            .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
+            .each($.proxy(function (i, element) {
+                var $element = $(element)
+                this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
+            }, this))
+            .end()
+    }
+
+    Collapse.prototype.addAriaAndCollapsedClass = function ($element, $trigger) {
+        var isOpen = $element.hasClass('in')
+
+        $element.attr('aria-expanded', isOpen)
+        $trigger
+            .toggleClass('collapsed', !isOpen)
+            .attr('aria-expanded', isOpen)
+    }
+
+    function getTargetFromTrigger($trigger) {
+        var href
+        var target = $trigger.attr('data-target')
+            || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
+
+        return $(target)
+    }
+
+
+    // COLLAPSE PLUGIN DEFINITION
+    // ==========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.collapse')
+            var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+            if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
+            if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.collapse
+
+    $.fn.collapse = Plugin
+    $.fn.collapse.Constructor = Collapse
+
+
+    // COLLAPSE NO CONFLICT
+    // ====================
+
+    $.fn.collapse.noConflict = function () {
+        $.fn.collapse = old
+        return this
+    }
+
+
+    // COLLAPSE DATA-API
+    // =================
+
+    $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+        var $this = $(this)
+
+        if (!$this.attr('data-target')) e.preventDefault()
+
+        var $target = getTargetFromTrigger($this)
+        var data = $target.data('bs.collapse')
+        var option = data ? 'toggle' : $this.data()
+
+        Plugin.call($target, option)
+    })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: dropdown.js v3.3.7
+ * http://getbootstrap.com/javascript/#dropdowns
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // DROPDOWN CLASS DEFINITION
+    // =========================
+
+    var backdrop = '.dropdown-backdrop'
+    var toggle = '[data-toggle="dropdown"]'
+    var Dropdown = function (element) {
+        $(element).on('click.bs.dropdown', this.toggle)
+    }
+
+    Dropdown.VERSION = '3.3.7'
+
+    function getParent($this) {
+        var selector = $this.attr('data-target')
+
+        if (!selector) {
+            selector = $this.attr('href')
+            selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+        }
+
+        var $parent = selector && $(selector)
+
+        return $parent && $parent.length ? $parent : $this.parent()
+    }
+
+    function clearMenus(e) {
+        if (e && e.which === 3) return
+        $(backdrop).remove()
+        $(toggle).each(function () {
+            var $this = $(this)
+            var $parent = getParent($this)
+            var relatedTarget = {relatedTarget: this}
+
+            if (!$parent.hasClass('open')) return
+
+            if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
+
+            $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
+
+            if (e.isDefaultPrevented()) return
+
+            $this.attr('aria-expanded', 'false')
+            $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
+        })
+    }
+
+    Dropdown.prototype.toggle = function (e) {
+        var $this = $(this)
+
+        if ($this.is('.disabled, :disabled')) return
+
+        var $parent = getParent($this)
+        var isActive = $parent.hasClass('open')
+
+        clearMenus()
+
+        if (!isActive) {
+            if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
+                // if mobile we use a backdrop because click events don't delegate
+                $(document.createElement('div'))
+                    .addClass('dropdown-backdrop')
+                    .insertAfter($(this))
+                    .on('click', clearMenus)
+            }
+
+            var relatedTarget = {relatedTarget: this}
+            $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
+
+            if (e.isDefaultPrevented()) return
+
+            $this
+                .trigger('focus')
+                .attr('aria-expanded', 'true')
+
+            $parent
+                .toggleClass('open')
+                .trigger($.Event('shown.bs.dropdown', relatedTarget))
+        }
+
+        return false
+    }
+
+    Dropdown.prototype.keydown = function (e) {
+        if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
+
+        var $this = $(this)
+
+        e.preventDefault()
+        e.stopPropagation()
+
+        if ($this.is('.disabled, :disabled')) return
+
+        var $parent = getParent($this)
+        var isActive = $parent.hasClass('open')
+
+        if (!isActive && e.which != 27 || isActive && e.which == 27) {
+            if (e.which == 27) $parent.find(toggle).trigger('focus')
+            return $this.trigger('click')
+        }
+
+        var desc = ' li:not(.disabled):visible a'
+        var $items = $parent.find('.dropdown-menu' + desc)
+
+        if (!$items.length) return
+
+        var index = $items.index(e.target)
+
+        if (e.which == 38 && index > 0) index--         // up
+        if (e.which == 40 && index < $items.length - 1) index++         // down
+        if (!~index) index = 0
+
+        $items.eq(index).trigger('focus')
+    }
+
+
+    // DROPDOWN PLUGIN DEFINITION
+    // ==========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.dropdown')
+
+            if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
+            if (typeof option == 'string') data[option].call($this)
+        })
+    }
+
+    var old = $.fn.dropdown
+
+    $.fn.dropdown = Plugin
+    $.fn.dropdown.Constructor = Dropdown
+
+
+    // DROPDOWN NO CONFLICT
+    // ====================
+
+    $.fn.dropdown.noConflict = function () {
+        $.fn.dropdown = old
+        return this
+    }
+
+
+    // APPLY TO STANDARD DROPDOWN ELEMENTS
+    // ===================================
+
+    $(document)
+        .on('click.bs.dropdown.data-api', clearMenus)
+        .on('click.bs.dropdown.data-api', '.dropdown form', function (e) {
+            e.stopPropagation()
+        })
+        .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
+        .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
+        .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: modal.js v3.3.7
+ * http://getbootstrap.com/javascript/#modals
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // MODAL CLASS DEFINITION
+    // ======================
+
+    var Modal = function (element, options) {
+        this.options = options
+        this.$body = $(document.body)
+        this.$element = $(element)
+        this.$dialog = this.$element.find('.modal-dialog')
+        this.$backdrop = null
+        this.isShown = null
+        this.originalBodyPad = null
+        this.scrollbarWidth = 0
+        this.ignoreBackdropClick = false
+
+        if (this.options.remote) {
+            this.$element
+                .find('.modal-content')
+                .load(this.options.remote, $.proxy(function () {
+                    this.$element.trigger('loaded.bs.modal')
+                }, this))
+        }
+    }
+
+    Modal.VERSION = '3.3.7'
+
+    Modal.TRANSITION_DURATION = 300
+    Modal.BACKDROP_TRANSITION_DURATION = 150
+
+    Modal.DEFAULTS = {
+        backdrop: true,
+        keyboard: true,
+        show: true
+    }
+
+    Modal.prototype.toggle = function (_relatedTarget) {
+        return this.isShown ? this.hide() : this.show(_relatedTarget)
+    }
+
+    Modal.prototype.show = function (_relatedTarget) {
+        var that = this
+        var e = $.Event('show.bs.modal', {relatedTarget: _relatedTarget})
+
+        this.$element.trigger(e)
+
+        if (this.isShown || e.isDefaultPrevented()) return
+
+        this.isShown = true
+
+        this.checkScrollbar()
+        this.setScrollbar()
+        this.$body.addClass('modal-open')
+
+        this.escape()
+        this.resize()
+
+        this.$element.on('click.dismiss.bs.modal', '[data-dismiss="modal"]', $.proxy(this.hide, this))
+
+        this.$dialog.on('mousedown.dismiss.bs.modal', function () {
+            that.$element.one('mouseup.dismiss.bs.modal', function (e) {
+                if ($(e.target).is(that.$element)) that.ignoreBackdropClick = true
+            })
+        })
+
+        this.backdrop(function () {
+            var transition = $.support.transition && that.$element.hasClass('fade')
+
+            if (!that.$element.parent().length) {
+                that.$element.appendTo(that.$body) // don't move modals dom position
+            }
+
+            that.$element
+                .show()
+                .scrollTop(0)
+
+            that.adjustDialog()
+
+            if (transition) {
+                that.$element[0].offsetWidth // force reflow
+            }
+
+            that.$element.addClass('in')
+
+            that.enforceFocus()
+
+            var e = $.Event('shown.bs.modal', {relatedTarget: _relatedTarget})
+
+            transition ?
+                that.$dialog // wait for modal to slide in
+                    .one('bsTransitionEnd', function () {
+                        that.$element.trigger('focus').trigger(e)
+                    })
+                    .emulateTransitionEnd(Modal.TRANSITION_DURATION) :
+                that.$element.trigger('focus').trigger(e)
+        })
+    }
+
+    Modal.prototype.hide = function (e) {
+        if (e) e.preventDefault()
+
+        e = $.Event('hide.bs.modal')
+
+        this.$element.trigger(e)
+
+        if (!this.isShown || e.isDefaultPrevented()) return
+
+        this.isShown = false
+
+        this.escape()
+        this.resize()
+
+        $(document).off('focusin.bs.modal')
+
+        this.$element
+            .removeClass('in')
+            .off('click.dismiss.bs.modal')
+            .off('mouseup.dismiss.bs.modal')
+
+        this.$dialog.off('mousedown.dismiss.bs.modal')
+
+        $.support.transition && this.$element.hasClass('fade') ?
+            this.$element
+                .one('bsTransitionEnd', $.proxy(this.hideModal, this))
+                .emulateTransitionEnd(Modal.TRANSITION_DURATION) :
+            this.hideModal()
+    }
+
+    Modal.prototype.enforceFocus = function () {
+        $(document)
+            .off('focusin.bs.modal') // guard against infinite focus loop
+            .on('focusin.bs.modal', $.proxy(function (e) {
+                if (document !== e.target &&
+                    this.$element[0] !== e.target &&
+                    !this.$element.has(e.target).length) {
+                    this.$element.trigger('focus')
+                }
+            }, this))
+    }
+
+    Modal.prototype.escape = function () {
+        if (this.isShown && this.options.keyboard) {
+            this.$element.on('keydown.dismiss.bs.modal', $.proxy(function (e) {
+                e.which == 27 && this.hide()
+            }, this))
+        } else if (!this.isShown) {
+            this.$element.off('keydown.dismiss.bs.modal')
+        }
+    }
+
+    Modal.prototype.resize = function () {
+        if (this.isShown) {
+            $(window).on('resize.bs.modal', $.proxy(this.handleUpdate, this))
+        } else {
+            $(window).off('resize.bs.modal')
+        }
+    }
+
+    Modal.prototype.hideModal = function () {
+        var that = this
+        this.$element.hide()
+        this.backdrop(function () {
+            that.$body.removeClass('modal-open')
+            that.resetAdjustments()
+            that.resetScrollbar()
+            that.$element.trigger('hidden.bs.modal')
+        })
+    }
+
+    Modal.prototype.removeBackdrop = function () {
+        this.$backdrop && this.$backdrop.remove()
+        this.$backdrop = null
+    }
+
+    Modal.prototype.backdrop = function (callback) {
+        var that = this
+        var animate = this.$element.hasClass('fade') ? 'fade' : ''
+
+        if (this.isShown && this.options.backdrop) {
+            var doAnimate = $.support.transition && animate
+
+            this.$backdrop = $(document.createElement('div'))
+                .addClass('modal-backdrop ' + animate)
+                .appendTo(this.$body)
+
+            this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
+                if (this.ignoreBackdropClick) {
+                    this.ignoreBackdropClick = false
+                    return
+                }
+                if (e.target !== e.currentTarget) return
+                this.options.backdrop == 'static'
+                    ? this.$element[0].focus()
+                    : this.hide()
+            }, this))
+
+            if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
+
+            this.$backdrop.addClass('in')
+
+            if (!callback) return
+
+            doAnimate ?
+                this.$backdrop
+                    .one('bsTransitionEnd', callback)
+                    .emulateTransitionEnd(Modal.BACKDROP_TRANSITION_DURATION) :
+                callback()
+
+        } else if (!this.isShown && this.$backdrop) {
+            this.$backdrop.removeClass('in')
+
+            var callbackRemove = function () {
+                that.removeBackdrop()
+                callback && callback()
+            }
+            $.support.transition && this.$element.hasClass('fade') ?
+                this.$backdrop
+                    .one('bsTransitionEnd', callbackRemove)
+                    .emulateTransitionEnd(Modal.BACKDROP_TRANSITION_DURATION) :
+                callbackRemove()
+
+        } else if (callback) {
+            callback()
+        }
+    }
+
+    // these following methods are used to handle overflowing modals
+
+    Modal.prototype.handleUpdate = function () {
+        this.adjustDialog()
+    }
+
+    Modal.prototype.adjustDialog = function () {
+        var modalIsOverflowing = this.$element[0].scrollHeight > document.documentElement.clientHeight
+
+        this.$element.css({
+            paddingLeft: !this.bodyIsOverflowing && modalIsOverflowing ? this.scrollbarWidth : '',
+            paddingRight: this.bodyIsOverflowing && !modalIsOverflowing ? this.scrollbarWidth : ''
+        })
+    }
+
+    Modal.prototype.resetAdjustments = function () {
+        this.$element.css({
+            paddingLeft: '',
+            paddingRight: ''
+        })
+    }
+
+    Modal.prototype.checkScrollbar = function () {
+        var fullWindowWidth = window.innerWidth
+        if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
+            var documentElementRect = document.documentElement.getBoundingClientRect()
+            fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left)
+        }
+        this.bodyIsOverflowing = document.body.clientWidth < fullWindowWidth
+        this.scrollbarWidth = this.measureScrollbar()
+    }
+
+    Modal.prototype.setScrollbar = function () {
+        var bodyPad = parseInt((this.$body.css('padding-right') || 0), 10)
+        this.originalBodyPad = document.body.style.paddingRight || ''
+        if (this.bodyIsOverflowing) this.$body.css('padding-right', bodyPad + this.scrollbarWidth)
+    }
+
+    Modal.prototype.resetScrollbar = function () {
+        this.$body.css('padding-right', this.originalBodyPad)
+    }
+
+    Modal.prototype.measureScrollbar = function () { // thx walsh
+        var scrollDiv = document.createElement('div')
+        scrollDiv.className = 'modal-scrollbar-measure'
+        this.$body.append(scrollDiv)
+        var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
+        this.$body[0].removeChild(scrollDiv)
+        return scrollbarWidth
+    }
+
+
+    // MODAL PLUGIN DEFINITION
+    // =======================
+
+    function Plugin(option, _relatedTarget) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.modal')
+            var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+            if (!data) $this.data('bs.modal', (data = new Modal(this, options)))
+            if (typeof option == 'string') data[option](_relatedTarget)
+            else if (options.show) data.show(_relatedTarget)
+        })
+    }
+
+    var old = $.fn.modal
+
+    $.fn.modal = Plugin
+    $.fn.modal.Constructor = Modal
+
+
+    // MODAL NO CONFLICT
+    // =================
+
+    $.fn.modal.noConflict = function () {
+        $.fn.modal = old
+        return this
+    }
+
+
+    // MODAL DATA-API
+    // ==============
+
+    $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
+        var $this = $(this)
+        var href = $this.attr('href')
+        var $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
+        var option = $target.data('bs.modal') ? 'toggle' : $.extend({remote: !/#/.test(href) && href}, $target.data(), $this.data())
+
+        if ($this.is('a')) e.preventDefault()
+
+        $target.one('show.bs.modal', function (showEvent) {
+            if (showEvent.isDefaultPrevented()) return // only register focus restorer if modal will actually get shown
+            $target.one('hidden.bs.modal', function () {
+                $this.is(':visible') && $this.trigger('focus')
+            })
+        })
+        Plugin.call($target, option, this)
+    })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: tooltip.js v3.3.7
+ * http://getbootstrap.com/javascript/#tooltip
+ * Inspired by the original jQuery.tipsy by Jason Frame
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // TOOLTIP PUBLIC CLASS DEFINITION
+    // ===============================
+
+    var Tooltip = function (element, options) {
+        this.type = null
+        this.options = null
+        this.enabled = null
+        this.timeout = null
+        this.hoverState = null
+        this.$element = null
+        this.inState = null
+
+        this.init('tooltip', element, options)
+    }
+
+    Tooltip.VERSION = '3.3.7'
+
+    Tooltip.TRANSITION_DURATION = 150
+
+    Tooltip.DEFAULTS = {
+        animation: true,
+        placement: 'top',
+        selector: false,
+        template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
+        trigger: 'hover focus',
+        title: '',
+        delay: 0,
+        html: false,
+        container: false,
+        viewport: {
+            selector: 'body',
+            padding: 0
+        }
+    }
+
+    Tooltip.prototype.init = function (type, element, options) {
+        this.enabled = true
+        this.type = type
+        this.$element = $(element)
+        this.options = this.getOptions(options)
+        this.$viewport = this.options.viewport && $($.isFunction(this.options.viewport) ? this.options.viewport.call(this, this.$element) : (this.options.viewport.selector || this.options.viewport))
+        this.inState = {click: false, hover: false, focus: false}
+
+        if (this.$element[0] instanceof document.constructor && !this.options.selector) {
+            throw new Error('`selector` option must be specified when initializing ' + this.type + ' on the window.document object!')
+        }
+
+        var triggers = this.options.trigger.split(' ')
+
+        for (var i = triggers.length; i--;) {
+            var trigger = triggers[i]
+
+            if (trigger == 'click') {
+                this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
+            } else if (trigger != 'manual') {
+                var eventIn = trigger == 'hover' ? 'mouseenter' : 'focusin'
+                var eventOut = trigger == 'hover' ? 'mouseleave' : 'focusout'
+
+                this.$element.on(eventIn + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
+                this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
+            }
+        }
+
+        this.options.selector ?
+            (this._options = $.extend({}, this.options, {trigger: 'manual', selector: ''})) :
+            this.fixTitle()
+    }
+
+    Tooltip.prototype.getDefaults = function () {
+        return Tooltip.DEFAULTS
+    }
+
+    Tooltip.prototype.getOptions = function (options) {
+        options = $.extend({}, this.getDefaults(), this.$element.data(), options)
+
+        if (options.delay && typeof options.delay == 'number') {
+            options.delay = {
+                show: options.delay,
+                hide: options.delay
+            }
+        }
+
+        return options
+    }
+
+    Tooltip.prototype.getDelegateOptions = function () {
+        var options = {}
+        var defaults = this.getDefaults()
+
+        this._options && $.each(this._options, function (key, value) {
+            if (defaults[key] != value) options[key] = value
+        })
+
+        return options
+    }
+
+    Tooltip.prototype.enter = function (obj) {
+        var self = obj instanceof this.constructor ?
+            obj : $(obj.currentTarget).data('bs.' + this.type)
+
+        if (!self) {
+            self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
+            $(obj.currentTarget).data('bs.' + this.type, self)
+        }
+
+        if (obj instanceof $.Event) {
+            self.inState[obj.type == 'focusin' ? 'focus' : 'hover'] = true
+        }
+
+        if (self.tip().hasClass('in') || self.hoverState == 'in') {
+            self.hoverState = 'in'
+            return
+        }
+
+        clearTimeout(self.timeout)
+
+        self.hoverState = 'in'
+
+        if (!self.options.delay || !self.options.delay.show) return self.show()
+
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == 'in') self.show()
+        }, self.options.delay.show)
+    }
+
+    Tooltip.prototype.isInStateTrue = function () {
+        for (var key in this.inState) {
+            if (this.inState[key]) return true
+        }
+
+        return false
+    }
+
+    Tooltip.prototype.leave = function (obj) {
+        var self = obj instanceof this.constructor ?
+            obj : $(obj.currentTarget).data('bs.' + this.type)
+
+        if (!self) {
+            self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
+            $(obj.currentTarget).data('bs.' + this.type, self)
+        }
+
+        if (obj instanceof $.Event) {
+            self.inState[obj.type == 'focusout' ? 'focus' : 'hover'] = false
+        }
+
+        if (self.isInStateTrue()) return
+
+        clearTimeout(self.timeout)
+
+        self.hoverState = 'out'
+
+        if (!self.options.delay || !self.options.delay.hide) return self.hide()
+
+        self.timeout = setTimeout(function () {
+            if (self.hoverState == 'out') self.hide()
+        }, self.options.delay.hide)
+    }
+
+    Tooltip.prototype.show = function () {
+        var e = $.Event('show.bs.' + this.type)
+
+        if (this.hasContent() && this.enabled) {
+            this.$element.trigger(e)
+
+            var inDom = $.contains(this.$element[0].ownerDocument.documentElement, this.$element[0])
+            if (e.isDefaultPrevented() || !inDom) return
+            var that = this
+
+            var $tip = this.tip()
+
+            var tipId = this.getUID(this.type)
+
+            this.setContent()
+            $tip.attr('id', tipId)
+            this.$element.attr('aria-describedby', tipId)
+
+            if (this.options.animation) $tip.addClass('fade')
+
+            var placement = typeof this.options.placement == 'function' ?
+                this.options.placement.call(this, $tip[0], this.$element[0]) :
+                this.options.placement
+
+            var autoToken = /\s?auto?\s?/i
+            var autoPlace = autoToken.test(placement)
+            if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
+
+            $tip
+                .detach()
+                .css({top: 0, left: 0, display: 'block'})
+                .addClass(placement)
+                .data('bs.' + this.type, this)
+
+            this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
+            this.$element.trigger('inserted.bs.' + this.type)
+
+            var pos = this.getPosition()
+            var actualWidth = $tip[0].offsetWidth
+            var actualHeight = $tip[0].offsetHeight
+
+            if (autoPlace) {
+                var orgPlacement = placement
+                var viewportDim = this.getPosition(this.$viewport)
+
+                placement = placement == 'bottom' && pos.bottom + actualHeight > viewportDim.bottom ? 'top' :
+                    placement == 'top' && pos.top - actualHeight < viewportDim.top ? 'bottom' :
+                        placement == 'right' && pos.right + actualWidth > viewportDim.width ? 'left' :
+                            placement == 'left' && pos.left - actualWidth < viewportDim.left ? 'right' :
+                                placement
+
+                $tip
+                    .removeClass(orgPlacement)
+                    .addClass(placement)
+            }
+
+            var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
+
+            this.applyPlacement(calculatedOffset, placement)
+
+            var complete = function () {
+                var prevHoverState = that.hoverState
+                that.$element.trigger('shown.bs.' + that.type)
+                that.hoverState = null
+
+                if (prevHoverState == 'out') that.leave(that)
+            }
+
+            $.support.transition && this.$tip.hasClass('fade') ?
+                $tip
+                    .one('bsTransitionEnd', complete)
+                    .emulateTransitionEnd(Tooltip.TRANSITION_DURATION) :
+                complete()
+        }
+    }
+
+    Tooltip.prototype.applyPlacement = function (offset, placement) {
+        var $tip = this.tip()
+        var width = $tip[0].offsetWidth
+        var height = $tip[0].offsetHeight
+
+        // manually read margins because getBoundingClientRect includes difference
+        var marginTop = parseInt($tip.css('margin-top'), 10)
+        var marginLeft = parseInt($tip.css('margin-left'), 10)
+
+        // we must check for NaN for ie 8/9
+        if (isNaN(marginTop)) marginTop = 0
+        if (isNaN(marginLeft)) marginLeft = 0
+
+        offset.top += marginTop
+        offset.left += marginLeft
+
+        // $.fn.offset doesn't round pixel values
+        // so we use setOffset directly with our own function B-0
+        $.offset.setOffset($tip[0], $.extend({
+            using: function (props) {
+                $tip.css({
+                    top: Math.round(props.top),
+                    left: Math.round(props.left)
+                })
+            }
+        }, offset), 0)
+
+        $tip.addClass('in')
+
+        // check to see if placing tip in new offset caused the tip to resize itself
+        var actualWidth = $tip[0].offsetWidth
+        var actualHeight = $tip[0].offsetHeight
+
+        if (placement == 'top' && actualHeight != height) {
+            offset.top = offset.top + height - actualHeight
+        }
+
+        var delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight)
+
+        if (delta.left) offset.left += delta.left
+        else offset.top += delta.top
+
+        var isVertical = /top|bottom/.test(placement)
+        var arrowDelta = isVertical ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight
+        var arrowOffsetPosition = isVertical ? 'offsetWidth' : 'offsetHeight'
+
+        $tip.offset(offset)
+        this.replaceArrow(arrowDelta, $tip[0][arrowOffsetPosition], isVertical)
+    }
+
+    Tooltip.prototype.replaceArrow = function (delta, dimension, isVertical) {
+        this.arrow()
+            .css(isVertical ? 'left' : 'top', 50 * (1 - delta / dimension) + '%')
+            .css(isVertical ? 'top' : 'left', '')
+    }
+
+    Tooltip.prototype.setContent = function () {
+        var $tip = this.tip()
+        var title = this.getTitle()
+
+        $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+        $tip.removeClass('fade in top bottom left right')
+    }
+
+    Tooltip.prototype.hide = function (callback) {
+        var that = this
+        var $tip = $(this.$tip)
+        var e = $.Event('hide.bs.' + this.type)
+
+        function complete() {
+            if (that.hoverState != 'in') $tip.detach()
+            if (that.$element) { // TODO: Check whether guarding this code with this `if` is really necessary.
+                that.$element
+                    .removeAttr('aria-describedby')
+                    .trigger('hidden.bs.' + that.type)
+            }
+            callback && callback()
+        }
+
+        this.$element.trigger(e)
+
+        if (e.isDefaultPrevented()) return
+
+        $tip.removeClass('in')
+
+        $.support.transition && $tip.hasClass('fade') ?
+            $tip
+                .one('bsTransitionEnd', complete)
+                .emulateTransitionEnd(Tooltip.TRANSITION_DURATION) :
+            complete()
+
+        this.hoverState = null
+
+        return this
+    }
+
+    Tooltip.prototype.fixTitle = function () {
+        var $e = this.$element
+        if ($e.attr('title') || typeof $e.attr('data-original-title') != 'string') {
+            $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
+        }
+    }
+
+    Tooltip.prototype.hasContent = function () {
+        return this.getTitle()
+    }
+
+    Tooltip.prototype.getPosition = function ($element) {
+        $element = $element || this.$element
+
+        var el = $element[0]
+        var isBody = el.tagName == 'BODY'
+
+        var elRect = el.getBoundingClientRect()
+        if (elRect.width == null) {
+            // width and height are missing in IE8, so compute them manually; see https://github.com/twbs/bootstrap/issues/14093
+            elRect = $.extend({}, elRect, {width: elRect.right - elRect.left, height: elRect.bottom - elRect.top})
+        }
+        var isSvg = window.SVGElement && el instanceof window.SVGElement
+        // Avoid using $.offset() on SVGs since it gives incorrect results in jQuery 3.
+        // See https://github.com/twbs/bootstrap/issues/20280
+        var elOffset = isBody ? {top: 0, left: 0} : (isSvg ? null : $element.offset())
+        var scroll = {scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop()}
+        var outerDims = isBody ? {width: $(window).width(), height: $(window).height()} : null
+
+        return $.extend({}, elRect, scroll, outerDims, elOffset)
+    }
+
+    Tooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
+        return placement == 'bottom' ? {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2} :
+            placement == 'top' ? {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2} :
+                placement == 'left' ? {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth} :
+                    /* placement == 'right' */ {
+                        top: pos.top + pos.height / 2 - actualHeight / 2,
+                        left: pos.left + pos.width
+                    }
+
+    }
+
+    Tooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
+        var delta = {top: 0, left: 0}
+        if (!this.$viewport) return delta
+
+        var viewportPadding = this.options.viewport && this.options.viewport.padding || 0
+        var viewportDimensions = this.getPosition(this.$viewport)
+
+        if (/right|left/.test(placement)) {
+            var topEdgeOffset = pos.top - viewportPadding - viewportDimensions.scroll
+            var bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight
+            if (topEdgeOffset < viewportDimensions.top) { // top overflow
+                delta.top = viewportDimensions.top - topEdgeOffset
+            } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) { // bottom overflow
+                delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset
+            }
+        } else {
+            var leftEdgeOffset = pos.left - viewportPadding
+            var rightEdgeOffset = pos.left + viewportPadding + actualWidth
+            if (leftEdgeOffset < viewportDimensions.left) { // left overflow
+                delta.left = viewportDimensions.left - leftEdgeOffset
+            } else if (rightEdgeOffset > viewportDimensions.right) { // right overflow
+                delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset
+            }
+        }
+
+        return delta
+    }
+
+    Tooltip.prototype.getTitle = function () {
+        var title
+        var $e = this.$element
+        var o = this.options
+
+        title = $e.attr('data-original-title')
+            || (typeof o.title == 'function' ? o.title.call($e[0]) : o.title)
+
+        return title
+    }
+
+    Tooltip.prototype.getUID = function (prefix) {
+        do prefix += ~~(Math.random() * 1000000)
+        while (document.getElementById(prefix))
+        return prefix
+    }
+
+    Tooltip.prototype.tip = function () {
+        if (!this.$tip) {
+            this.$tip = $(this.options.template)
+            if (this.$tip.length != 1) {
+                throw new Error(this.type + ' `template` option must consist of exactly 1 top-level element!')
+            }
+        }
+        return this.$tip
+    }
+
+    Tooltip.prototype.arrow = function () {
+        return (this.$arrow = this.$arrow || this.tip().find('.tooltip-arrow'))
+    }
+
+    Tooltip.prototype.enable = function () {
+        this.enabled = true
+    }
+
+    Tooltip.prototype.disable = function () {
+        this.enabled = false
+    }
+
+    Tooltip.prototype.toggleEnabled = function () {
+        this.enabled = !this.enabled
+    }
+
+    Tooltip.prototype.toggle = function (e) {
+        var self = this
+        if (e) {
+            self = $(e.currentTarget).data('bs.' + this.type)
+            if (!self) {
+                self = new this.constructor(e.currentTarget, this.getDelegateOptions())
+                $(e.currentTarget).data('bs.' + this.type, self)
+            }
+        }
+
+        if (e) {
+            self.inState.click = !self.inState.click
+            if (self.isInStateTrue()) self.enter(self)
+            else self.leave(self)
+        } else {
+            self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
+        }
+    }
+
+    Tooltip.prototype.destroy = function () {
+        var that = this
+        clearTimeout(this.timeout)
+        this.hide(function () {
+            that.$element.off('.' + that.type).removeData('bs.' + that.type)
+            if (that.$tip) {
+                that.$tip.detach()
+            }
+            that.$tip = null
+            that.$arrow = null
+            that.$viewport = null
+            that.$element = null
+        })
+    }
+
+
+    // TOOLTIP PLUGIN DEFINITION
+    // =========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.tooltip')
+            var options = typeof option == 'object' && option
+
+            if (!data && /destroy|hide/.test(option)) return
+            if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.tooltip
+
+    $.fn.tooltip = Plugin
+    $.fn.tooltip.Constructor = Tooltip
+
+
+    // TOOLTIP NO CONFLICT
+    // ===================
+
+    $.fn.tooltip.noConflict = function () {
+        $.fn.tooltip = old
+        return this
+    }
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: popover.js v3.3.7
+ * http://getbootstrap.com/javascript/#popovers
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // POPOVER PUBLIC CLASS DEFINITION
+    // ===============================
+
+    var Popover = function (element, options) {
+        this.init('popover', element, options)
+    }
+
+    if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
+
+    Popover.VERSION = '3.3.7'
+
+    Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
+        placement: 'right',
+        trigger: 'click',
+        content: '',
+        template: '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+    })
+
+
+    // NOTE: POPOVER EXTENDS tooltip.js
+    // ================================
+
+    Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype)
+
+    Popover.prototype.constructor = Popover
+
+    Popover.prototype.getDefaults = function () {
+        return Popover.DEFAULTS
+    }
+
+    Popover.prototype.setContent = function () {
+        var $tip = this.tip()
+        var title = this.getTitle()
+        var content = this.getContent()
+
+        $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
+        $tip.find('.popover-content').children().detach().end()[ // we use append for html objects to maintain js events
+            this.options.html ? (typeof content == 'string' ? 'html' : 'append') : 'text'
+            ](content)
+
+        $tip.removeClass('fade top bottom left right in')
+
+        // IE8 doesn't accept hiding via the `:empty` pseudo selector, we have to do
+        // this manually by checking the contents.
+        if (!$tip.find('.popover-title').html()) $tip.find('.popover-title').hide()
+    }
+
+    Popover.prototype.hasContent = function () {
+        return this.getTitle() || this.getContent()
+    }
+
+    Popover.prototype.getContent = function () {
+        var $e = this.$element
+        var o = this.options
+
+        return $e.attr('data-content')
+            || (typeof o.content == 'function' ?
+                o.content.call($e[0]) :
+                o.content)
+    }
+
+    Popover.prototype.arrow = function () {
+        return (this.$arrow = this.$arrow || this.tip().find('.arrow'))
+    }
+
+
+    // POPOVER PLUGIN DEFINITION
+    // =========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.popover')
+            var options = typeof option == 'object' && option
+
+            if (!data && /destroy|hide/.test(option)) return
+            if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.popover
+
+    $.fn.popover = Plugin
+    $.fn.popover.Constructor = Popover
+
+
+    // POPOVER NO CONFLICT
+    // ===================
+
+    $.fn.popover.noConflict = function () {
+        $.fn.popover = old
+        return this
+    }
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: scrollspy.js v3.3.7
+ * http://getbootstrap.com/javascript/#scrollspy
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+        this.$body = $(document.body)
+        this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+        this.options = $.extend({}, ScrollSpy.DEFAULTS, options)
+        this.selector = (this.options.target || '') + ' .nav li > a'
+        this.offsets = []
+        this.targets = []
+        this.activeTarget = null
+        this.scrollHeight = 0
+
+        this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+        this.refresh()
+        this.process()
+    }
+
+    ScrollSpy.VERSION = '3.3.7'
+
+    ScrollSpy.DEFAULTS = {
+        offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+        return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+        var that = this
+        var offsetMethod = 'offset'
+        var offsetBase = 0
+
+        this.offsets = []
+        this.targets = []
+        this.scrollHeight = this.getScrollHeight()
+
+        if (!$.isWindow(this.$scrollElement[0])) {
+            offsetMethod = 'position'
+            offsetBase = this.$scrollElement.scrollTop()
+        }
+
+        this.$body
+            .find(this.selector)
+            .map(function () {
+                var $el = $(this)
+                var href = $el.data('target') || $el.attr('href')
+                var $href = /^#./.test(href) && $(href)
+
+                return ($href
+                    && $href.length
+                    && $href.is(':visible')
+                    && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+            })
+            .sort(function (a, b) {
+                return a[0] - b[0]
+            })
+            .each(function () {
+                that.offsets.push(this[0])
+                that.targets.push(this[1])
+            })
+    }
+
+    ScrollSpy.prototype.process = function () {
+        var scrollTop = this.$scrollElement.scrollTop() + this.options.offset
+        var scrollHeight = this.getScrollHeight()
+        var maxScroll = this.options.offset + scrollHeight - this.$scrollElement.height()
+        var offsets = this.offsets
+        var targets = this.targets
+        var activeTarget = this.activeTarget
+        var i
+
+        if (this.scrollHeight != scrollHeight) {
+            this.refresh()
+        }
+
+        if (scrollTop >= maxScroll) {
+            return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+        }
+
+        if (activeTarget && scrollTop < offsets[0]) {
+            this.activeTarget = null
+            return this.clear()
+        }
+
+        for (i = offsets.length; i--;) {
+            activeTarget != targets[i]
+            && scrollTop >= offsets[i]
+            && (offsets[i + 1] === undefined || scrollTop < offsets[i + 1])
+            && this.activate(targets[i])
+        }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+        this.activeTarget = target
+
+        this.clear()
+
+        var selector = this.selector +
+            '[data-target="' + target + '"],' +
+            this.selector + '[href="' + target + '"]'
+
+        var active = $(selector)
+            .parents('li')
+            .addClass('active')
+
+        if (active.parent('.dropdown-menu').length) {
+            active = active
+                .closest('li.dropdown')
+                .addClass('active')
+        }
+
+        active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+        $(this.selector)
+            .parentsUntil(this.options.target, '.active')
+            .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.scrollspy')
+            var options = typeof option == 'object' && option
+
+            if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+        $.fn.scrollspy = old
+        return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+        $('[data-spy="scroll"]').each(function () {
+            var $spy = $(this)
+            Plugin.call($spy, $spy.data())
+        })
+    })
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: tab.js v3.3.7
+ * http://getbootstrap.com/javascript/#tabs
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // TAB CLASS DEFINITION
+    // ====================
+
+    var Tab = function (element) {
+        // jscs:disable requireDollarBeforejQueryAssignment
+        this.element = $(element)
+        // jscs:enable requireDollarBeforejQueryAssignment
+    }
+
+    Tab.VERSION = '3.3.7'
+
+    Tab.TRANSITION_DURATION = 150
+
+    Tab.prototype.show = function () {
+        var $this = this.element
+        var $ul = $this.closest('ul:not(.dropdown-menu)')
+        var selector = $this.data('target')
+
+        if (!selector) {
+            selector = $this.attr('href')
+            selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
+        }
+
+        if ($this.parent('li').hasClass('active')) return
+
+        var $previous = $ul.find('.active:last a')
+        var hideEvent = $.Event('hide.bs.tab', {
+            relatedTarget: $this[0]
+        })
+        var showEvent = $.Event('show.bs.tab', {
+            relatedTarget: $previous[0]
+        })
+
+        $previous.trigger(hideEvent)
+        $this.trigger(showEvent)
+
+        if (showEvent.isDefaultPrevented() || hideEvent.isDefaultPrevented()) return
+
+        var $target = $(selector)
+
+        this.activate($this.closest('li'), $ul)
+        this.activate($target, $target.parent(), function () {
+            $previous.trigger({
+                type: 'hidden.bs.tab',
+                relatedTarget: $this[0]
+            })
+            $this.trigger({
+                type: 'shown.bs.tab',
+                relatedTarget: $previous[0]
+            })
+        })
+    }
+
+    Tab.prototype.activate = function (element, container, callback) {
+        var $active = container.find('> .active')
+        var transition = callback
+            && $.support.transition
+            && ($active.length && $active.hasClass('fade') || !!container.find('> .fade').length)
+
+        function next() {
+            $active
+                .removeClass('active')
+                .find('> .dropdown-menu > .active')
+                .removeClass('active')
+                .end()
+                .find('[data-toggle="tab"]')
+                .attr('aria-expanded', false)
+
+            element
+                .addClass('active')
+                .find('[data-toggle="tab"]')
+                .attr('aria-expanded', true)
+
+            if (transition) {
+                element[0].offsetWidth // reflow for transition
+                element.addClass('in')
+            } else {
+                element.removeClass('fade')
+            }
+
+            if (element.parent('.dropdown-menu').length) {
+                element
+                    .closest('li.dropdown')
+                    .addClass('active')
+                    .end()
+                    .find('[data-toggle="tab"]')
+                    .attr('aria-expanded', true)
+            }
+
+            callback && callback()
+        }
+
+        $active.length && transition ?
+            $active
+                .one('bsTransitionEnd', next)
+                .emulateTransitionEnd(Tab.TRANSITION_DURATION) :
+            next()
+
+        $active.removeClass('in')
+    }
+
+
+    // TAB PLUGIN DEFINITION
+    // =====================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.tab')
+
+            if (!data) $this.data('bs.tab', (data = new Tab(this)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.tab
+
+    $.fn.tab = Plugin
+    $.fn.tab.Constructor = Tab
+
+
+    // TAB NO CONFLICT
+    // ===============
+
+    $.fn.tab.noConflict = function () {
+        $.fn.tab = old
+        return this
+    }
+
+
+    // TAB DATA-API
+    // ============
+
+    var clickHandler = function (e) {
+        e.preventDefault()
+        Plugin.call($(this), 'show')
+    }
+
+    $(document)
+        .on('click.bs.tab.data-api', '[data-toggle="tab"]', clickHandler)
+        .on('click.bs.tab.data-api', '[data-toggle="pill"]', clickHandler)
+
+}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: affix.js v3.3.7
+ * http://getbootstrap.com/javascript/#affix
+ * ========================================================================
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+    'use strict';
+
+    // AFFIX CLASS DEFINITION
+    // ======================
+
+    var Affix = function (element, options) {
+        this.options = $.extend({}, Affix.DEFAULTS, options)
+
+        this.$target = $(this.options.target)
+            .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
+            .on('click.bs.affix.data-api', $.proxy(this.checkPositionWithEventLoop, this))
+
+        this.$element = $(element)
+        this.affixed = null
+        this.unpin = null
+        this.pinnedOffset = null
+
+        this.checkPosition()
+    }
+
+    Affix.VERSION = '3.3.7'
+
+    Affix.RESET = 'affix affix-top affix-bottom'
+
+    Affix.DEFAULTS = {
+        offset: 0,
+        target: window
+    }
+
+    Affix.prototype.getState = function (scrollHeight, height, offsetTop, offsetBottom) {
+        var scrollTop = this.$target.scrollTop()
+        var position = this.$element.offset()
+        var targetHeight = this.$target.height()
+
+        if (offsetTop != null && this.affixed == 'top') return scrollTop < offsetTop ? 'top' : false
+
+        if (this.affixed == 'bottom') {
+            if (offsetTop != null) return (scrollTop + this.unpin <= position.top) ? false : 'bottom'
+            return (scrollTop + targetHeight <= scrollHeight - offsetBottom) ? false : 'bottom'
+        }
+
+        var initializing = this.affixed == null
+        var colliderTop = initializing ? scrollTop : position.top
+        var colliderHeight = initializing ? targetHeight : height
+
+        if (offsetTop != null && scrollTop <= offsetTop) return 'top'
+        if (offsetBottom != null && (colliderTop + colliderHeight >= scrollHeight - offsetBottom)) return 'bottom'
+
+        return false
+    }
+
+    Affix.prototype.getPinnedOffset = function () {
+        if (this.pinnedOffset) return this.pinnedOffset
+        this.$element.removeClass(Affix.RESET).addClass('affix')
+        var scrollTop = this.$target.scrollTop()
+        var position = this.$element.offset()
+        return (this.pinnedOffset = position.top - scrollTop)
+    }
+
+    Affix.prototype.checkPositionWithEventLoop = function () {
+        setTimeout($.proxy(this.checkPosition, this), 1)
+    }
+
+    Affix.prototype.checkPosition = function () {
+        if (!this.$element.is(':visible')) return
+
+        var height = this.$element.height()
+        var offset = this.options.offset
+        var offsetTop = offset.top
+        var offsetBottom = offset.bottom
+        var scrollHeight = Math.max($(document).height(), $(document.body).height())
+
+        if (typeof offset != 'object') offsetBottom = offsetTop = offset
+        if (typeof offsetTop == 'function') offsetTop = offset.top(this.$element)
+        if (typeof offsetBottom == 'function') offsetBottom = offset.bottom(this.$element)
+
+        var affix = this.getState(scrollHeight, height, offsetTop, offsetBottom)
+
+        if (this.affixed != affix) {
+            if (this.unpin != null) this.$element.css('top', '')
+
+            var affixType = 'affix' + (affix ? '-' + affix : '')
+            var e = $.Event(affixType + '.bs.affix')
+
+            this.$element.trigger(e)
+
+            if (e.isDefaultPrevented()) return
+
+            this.affixed = affix
+            this.unpin = affix == 'bottom' ? this.getPinnedOffset() : null
+
+            this.$element
+                .removeClass(Affix.RESET)
+                .addClass(affixType)
+                .trigger(affixType.replace('affix', 'affixed') + '.bs.affix')
+        }
+
+        if (affix == 'bottom') {
+            this.$element.offset({
+                top: scrollHeight - height - offsetBottom
+            })
+        }
+    }
+
+
+    // AFFIX PLUGIN DEFINITION
+    // =======================
+
+    function Plugin(option) {
+        return this.each(function () {
+            var $this = $(this)
+            var data = $this.data('bs.affix')
+            var options = typeof option == 'object' && option
+
+            if (!data) $this.data('bs.affix', (data = new Affix(this, options)))
+            if (typeof option == 'string') data[option]()
+        })
+    }
+
+    var old = $.fn.affix
+
+    $.fn.affix = Plugin
+    $.fn.affix.Constructor = Affix
+
+
+    // AFFIX NO CONFLICT
+    // =================
+
+    $.fn.affix.noConflict = function () {
+        $.fn.affix = old
+        return this
+    }
+
+
+    // AFFIX DATA-API
+    // ==============
+
+    $(window).on('load', function () {
+        $('[data-spy="affix"]').each(function () {
+            var $spy = $(this)
+            var data = $spy.data()
+
+            data.offset = data.offset || {}
+
+            if (data.offsetBottom != null) data.offset.bottom = data.offsetBottom
+            if (data.offsetTop != null) data.offset.top = data.offsetTop
+
+            Plugin.call($spy, data)
+        })
+    })
+
+}(jQuery);
+
 // Generated by CoffeeScript 1.8.0
 
 /*
@@ -1114,16 +3039,17 @@ function scrollTo(element){
 (function () {
     var $,
         __indexOf = [].indexOf || function (item) {
-                for (var i = 0, l = this.length; i < l; i++) {
-                    if (i in this && this[i] === item) return i;
-                }
-                return -1;
-            };
+            for (var i = 0, l = this.length; i < l; i++) {
+                if (i in this && this[i] === item) return i;
+            }
+            return -1;
+        };
 
     $ = jQuery;
 
     $.fn.validateCreditCard = function (callback, options) {
-        var bind, card, card_type, card_types, get_card_type, is_valid_length, is_valid_luhn, normalize, validateCard, validate_number, _i, _len, _ref;
+        var bind, card, card_type, card_types, get_card_type, is_valid_length, is_valid_luhn, normalize, validateCard,
+            validate_number, _i, _len, _ref;
         card_types = [
             {
                 name: 'amex',
@@ -1135,7 +3061,7 @@ function scrollTo(element){
                 valid_length: [14]
             }, {
                 name: 'diners',
-                pattern: /^3[86]/,
+                pattern: /^3(0[0-5]|[68][0-9])/,
                 valid_length: [14]
             }, {
                 name: 'jcb',
@@ -1150,12 +3076,20 @@ function scrollTo(element){
                 pattern: /^4(0(2739|6238)|2(1544|3949)|5(0942|732[01]|760[2345])|64620|91(511|60[23]|614)|99812)/,
                 valid_length: [16]
             }, {
+                name: 'elo',
+                pattern: /^(4011|438935|451416|4576|457393|504175|506699|5067|5090[4567]|636297|636368)/,
+                valid_length: [16]
+            }, {
                 name: 'visa',
                 pattern: /^4/,
                 valid_length: [13, 16, 19]
             }, {
+                name: 'codensa',
+                pattern: /^590712/,
+                valid_length: [16]
+            }, {
                 name: 'master',
-                pattern: /^5[1-5]/,
+                pattern: /^(5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)/,
                 valid_length: [16]
             }, {
                 name: 'maestro',
@@ -1314,7 +3248,7 @@ function makeCreditCardHelper(app) {
     });
 
     $(".expiration-input").on('keydown keyup', function (event) {
-        var expiration = app.instrument.expiration;
+        var expiration = app.instrument.card.expiration;
         var key = keyCodeAsText(event.which);
         if (event.type == 'keydown') {
             var maxLength = 5;
@@ -1330,18 +3264,18 @@ function makeCreditCardHelper(app) {
                         }
                     }
                     if (expiration.length == 2 && key.match(/\d/)) {
-                        app.instrument.expiration += "/";
+                        app.instrument.card.expiration += "/";
                     }
                 }
             } else {
                 if (expiration && expiration.length == 2) {
-                    app.instrument.expiration += "/";
+                    app.instrument.card.expiration += "/";
                 }
             }
             return true;
         } else {
             if (expiration && expiration.match(/\/\//)) {
-                app.instrument.expiration = expiration.replace('//', '/');
+                app.instrument.card.expiration = expiration.replace('//', '/');
             }
         }
     });
@@ -1349,10 +3283,15 @@ function makeCreditCardHelper(app) {
 
 function calculateExpiration(app, p2p) {
     moment.locale(p2p.locale);
-    app.expiration = moment(p2p.expiration).fromNow();
 
-    if (p2p.routes && p2p.routes.state) {
-        var millisecondsToExpire = (moment(p2p.expiration) - moment()) + 2000;
+    var diff = moment() - moment(p2p.date);
+    var realNow = function () {
+        return moment().subtract(diff / 1000, 'seconds');
+    };
+    app.expiration = moment(p2p.expiration).from(realNow());
+
+    if (p2p.actionable) {
+        var millisecondsToExpire = (moment(p2p.expiration) - realNow()) + 2000;
         // Some devices fail when the expiration its too large
         if (millisecondsToExpire < 7200000) {
             setTimeout(function () {
@@ -1362,21 +3301,23 @@ function calculateExpiration(app, p2p) {
     }
 
     setInterval(function () {
-        app.expiration = moment(p2p.expiration).fromNow();
+        app.expiration = moment(p2p.expiration).from(realNow());
     }, 10000);
 }
 
 /**
  * By default if its not provided the required, its REQUIRED
  */
+var namePattern = '/^[a-zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜÀÈÌÒÙÇçÃã\'\\.\\&\\- ]{2,60}$/i';
 var validationList = {
     'payer.name': {
         fields: 'name',
-        pattern: '/^[a-zñáéíóúäëïöüàèìòù\'\. ]+$/i'
+        pattern: namePattern
     },
     'payer.surname': {
         fields: 'surname',
-        pattern: '/^[a-zñáéíóúäëïöüàèìòù\'\. ]+$/i'
+        required: false,
+        validator: validateSurname
     },
     'payer.document': {
         fields: 'document',
@@ -1387,51 +3328,72 @@ var validationList = {
     },
     'payer.email': {
         fields: 'email',
-        pattern: '/^([a-z\\d_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-z\\d]{2,4})$/i'
+        pattern: '/^([a-z\\d_\.\-])+\\@(([a-zA-Z0-9\-])+\\.)+([a-z\\d]{2,4})$/i'
     },
     'payer.mobile': {
         fields: 'mobile',
-        pattern: '/([0|\+?\\d{1,5})?([0-9 \(\)]{7,})([\(\)\\w\\d\. ]+)?/'
+        pattern: '/([0|\+?\\d{1,5})?([0-9 \(\)]{7,})([\(\)\\w\\d\\. ]+)?/',
+        maxLength: 19
     },
     'gateway': {
         fields: 'payment-method-grid',
         validator: validatePaymentMethod
     },
-    'instrument.number': {
-        fields: 'card_number|debit_number|ris_number',
+    'instrument.card.number': {
+        fields: 'codensa_number|card_number|diners_number|debit_number|ris_number',
         validator: validateCardNumber
     },
-    'instrument.expiration': {
-        fields: 'card_expiration|debit_expiration|ris_expiration',
+    'instrument.card.expiration': {
+        fields: 'codensa_expiration|card_expiration|diners_expiration|debit_expiration|ris_expiration',
         pattern: '/^((1[012])|(0\\d))\/\\d{2}$/',
         validator: validateExpiration
     },
-    'instrument.cvv': {
-        fields: 'card_cvv|debit_cvv',
+    'instrument.card.cvv': {
+        fields: 'codensa_cvv|card_cvv|diners_cvv|debit_cvv|diners_wallet_cvv|wallet_card_cvv',
         pattern: '/^\\d{3,4}$/',
         validator: validateCVV
     },
-    'instrument.kind': {
+    'instrument.card.kind': {
         fields: 'debit_kind'
     },
-    'instrument.installments': {
-        fields: 'card_installments|ris_installments'
+    'instrument.card.installments': {
+        fields: 'codensa_installments|card_installments|diners_installments|ris_installments|wallet_card_installments'
     },
-    'instrument.interface': {
+    'instrument.bank.interface': {
         fields: 'pse_bank_interface'
     },
-    'instrument.code': {
-        fields: 'pse_bank_code'
+    'instrument.bank.code': {
+        fields: 'pse_bank_code|account_bank'
     },
     'instrument.pin': {
         fields: 'ganapin_pin|ris_pin'
     },
+    'instrument.otp': {
+        fields: 'diners_otp|diners_wallet_otp',
+        required: false,
+        validator: validateOTP
+    },
     'instrument.password': {
         fields: 'ganapin_password'
     },
-    'payment': {
+    'instrument.credit': {
+        fields: 'diners_credit|diners_wallet_credit',
+        validator: validateCredit
+    },
+    'partialPayment': {
         fields: 'partial_payment',
         validator: validatePartialAmount
+    },
+    'instrument.accountType': {
+        fields: 'account_type'
+    },
+    'instrument.accountNumber': {
+        fields: 'account_number',
+        pattern: '/^[\\w\\-]{3,20}$/'
+    },
+    'helpers.wOtp': {
+        fields: 'w_otp',
+        pattern: '/^\\d{6}$/'
     }
 };
 
@@ -1443,7 +3405,7 @@ validationEventListener = function (event) {
     var field = $(this);
     var fields, validation = null;
     var id = field.attr('id');
-    var idPattern = new RegExp(id + '(\||$)');
+    var idPattern = new RegExp(id + '(\\||$)');
     for (var temporalRule in validationList) {
         fields = validationList[temporalRule]['fields'];
         if (fields.search(idPattern) != -1) {
@@ -1457,9 +3419,10 @@ validationEventListener = function (event) {
 /**
  * It could validate one or more rules passing a string or an array
  * @param validations
+ * @param omit
  * @returns {boolean}
  */
-function validate(validations) {
+function validate(validations, omit) {
     validations = validations.split('|');
     var passing = true;
     var rule = null;
@@ -1474,15 +3437,15 @@ function validate(validations) {
                 continue;
             }
             var fields = rule['fields'];
-            manageClassForFieldGroups(fields, 'is-invalid', false);
-            manageClassForFieldGroups(fields, 'is-correct', false);
+            manageClassForFieldGroups(fields, 'is-invalid', false, omit);
+            manageClassForFieldGroups(fields, 'is-correct', false, omit);
 
             // Default validation
             var regex = rule['pattern'] ? getRegExp(rule['pattern']) : null;
             var maxLength = rule['maxLength'] ? rule['maxLength'] : null;
             var value = getValueWithNotation(validation);
 
-            if (rule.hasOwnProperty('required') && rule['required'] == false && value.length == 0) {
+            if (rule.hasOwnProperty('required') && rule['required'] == false && (!value || value.length == 0)) {
                 // Does not need validation because its not required and there is no value
             } else {
                 if (!value || value.length == 0) {
@@ -1501,16 +3464,16 @@ function validate(validations) {
 
             if (rule['validator']) {
                 // It has a custom function to validate
-                if (!rule['validator'](validation, rule)) {
+                if (!rule['validator'](validation, rule, omit)) {
                     passing = false;
                     itemPassing = false;
                 }
             }
 
             if (itemPassing) {
-                manageClassForFieldGroups(fields, 'is-correct', true);
+                manageClassForFieldGroups(fields, 'is-correct', true, omit);
             } else {
-                manageClassForFieldGroups(fields, 'is-invalid', true);
+                manageClassForFieldGroups(fields, 'is-invalid', true, omit);
             }
 
         }
@@ -1541,28 +3504,40 @@ function getRegExp(pattern) {
     return regex;
 }
 
-function manageClassForFieldGroups(fields, css, add) {
-    fields = fields.split('|');
-    var elementsGroup = null;
-    for (var field in fields) {
-        if (fields.hasOwnProperty(field)) {
-            field = fields[field];
-            elementsGroup = $("#" + field).closest('.form-group');
-            if (add) {
-                elementsGroup.addClass(css);
-            } else {
-                elementsGroup.removeClass(css);
+function manageClassForFieldGroups(fields, css, add, omit) {
+    if (!omit) {
+        fields = fields.split('|');
+        var elementsGroup = null;
+        for (var field in fields) {
+            if (fields.hasOwnProperty(field)) {
+                field = fields[field];
+                elementsGroup = $("#" + field).closest('.form-group');
+                if (add) {
+                    elementsGroup.addClass(css);
+                } else {
+                    elementsGroup.removeClass(css);
+                }
             }
         }
     }
 }
 
-function validateDocument(validation, rule) {
-    var documentTypeGroup = $("#document_type").closest('.form-group');
-    var documentGroup = $("#document").closest('.form-group');
+function getValueWithNotation(notation) {
+    try {
+        notation = notation.split('.');
+        var holder = app[notation[0]];
+        for (var i = 1; i < notation.length; i++) {
+            holder = holder[notation[i]];
+        }
+        return holder;
+    } catch (e) {
+        return null;
+    }
+}
 
-    documentGroup.removeClass('is-correct');
-    documentTypeGroup.removeClass('is-correct');
+function validateDocument(validation, rule, omit) {
+    manageClassForFieldGroups('document_type|document', 'is-correct', false, omit);
+    manageClassForFieldGroups('document_type|document', 'is-invalid', false, omit);
 
     var type = getValueWithNotation('payer.documentType');
     var value = getValueWithNotation('payer.document');
@@ -1573,29 +3548,49 @@ function validateDocument(validation, rule) {
 
     var documentTypeValidator = {
         'CC': '/^[1-9][0-9]{4,9}$/',
-        'NIT': '/^[1-9][0-9]{6,8}(\-[0-9])?$/',
         'CE': '/^([a-zA-Z]{1,5})?[1-9][0-9]{3,7}$/',
+        'NIT': '/^[1-9][0-9]{6,8}(\\-[0-9])?$/',
+        'RUT': '/^[1-9][0-9]{4,9}(\\-[0-9])?$/',
+        'TI': '/^[1-9][0-9]{4,11}$/',
+        'SSN': '/^([0-9]{3}\\-[0-9]{2}\\-[0-9]{4}|[0-9]{9})$/',
         'PPN': '/^[a-zA-z0-9]{4,12}$/',
-        'TAX': '/^\\w{4,12}$/',
-        'CPF': '/^\\d{11}$/'
+        'CPF': '/^\\d{11}$/',
+        'CI': '/^(\\d{9}\-?\\d)$/',
+        'RUC': '/^\\d{13,14}$/',
+        'TAX': '/^\\w{4,12}$/'
     };
-    documentTypeGroup.removeClass('is-invalid');
     if (!type) {
-        documentTypeGroup.addClass('is-invalid');
+        manageClassForFieldGroups('document_type', 'is-invalid', true, omit);
         return false;
     }
     var regex = getRegExp(documentTypeValidator[type]);
-    documentGroup.removeClass('is-invalid');
     if (!regex || !regex.test(value)) {
-        documentGroup.addClass('is-invalid');
+        manageClassForFieldGroups('document', 'is-invalid', true, omit);
         return false;
     }
-    documentGroup.addClass('is-correct');
-    documentTypeGroup.addClass('is-correct');
+    manageClassForFieldGroups('document_type|document', 'is-correct', true, omit);
     return true;
 }
 
-function validatePaymentMethod(validation, rule) {
+function validateCredit(validation, rule, omit) {
+    try {
+        if (!app.helpers.dinersService) {
+            return true;
+        }
+        var creditSplit = app.helpers.creditSelected.split('|');
+        if (creditSplit.length === 4) {
+            app.instrument.credit.code = creditSplit[0];
+            app.instrument.credit.type = creditSplit[1];
+            app.instrument.credit.groupCode = creditSplit[2];
+            app.instrument.credit.installment = creditSplit[3];
+            return true;
+        }
+    } catch (e) {
+    }
+    return false;
+}
+
+function validatePaymentMethod(validation, rule, omit) {
     if (!getValueWithNotation(validation)) {
         $("#" + rule['fields']).addClass('is-invalid');
         return false;
@@ -1604,16 +3599,18 @@ function validatePaymentMethod(validation, rule) {
     return true;
 }
 
-function validateCardNumber(validation, rule) {
+function validateCardNumber(validation, rule, omit) {
     var valid = app.validCreditCard;
-    manageClassForFieldGroups(rule['fields'], 'is-invalid', false);
+    manageClassForFieldGroups(rule['fields'], 'is-invalid', false, omit);
     if (!valid) {
-        manageClassForFieldGroups(rule['fields'], 'is-invalid', true);
+        manageClassForFieldGroups(rule['fields'], 'is-invalid', true, omit);
+    } else {
+        app.instrument.card.name = app.payer.name + " " + app.payer.surname;
     }
     return valid;
 }
 
-function validatePartialAmount(validation, rule) {
+function validatePartialAmount(validation, rule, omit) {
     var amount = getValueWithNotation(validation);
     if (amount < p2p.session.minPayment) {
         // Sets the maximum amount to be payed
@@ -1628,7 +3625,7 @@ function validatePartialAmount(validation, rule) {
     return true;
 }
 
-function validateExpiration(validation, rule) {
+function validateExpiration(validation, rule, omit) {
     var expiration = getValueWithNotation(validation);
     try {
         var month = +expiration.split('/')[0];
@@ -1636,10 +3633,10 @@ function validateExpiration(validation, rule) {
         var actualMonth = (new Date()).getMonth() + 1;
         var actualYear = (new Date()).getYear() - 100;
 
-        if (actualYear > year){
+        if (actualYear > year) {
             return false;
         }
-        if (year - actualYear > 10) {
+        if (year - actualYear > 30) {
             return false;
         }
         return !(actualYear == year && actualMonth > month);
@@ -1649,7 +3646,7 @@ function validateExpiration(validation, rule) {
     }
 }
 
-function validateCVV(validation, rule) {
+function validateCVV(validation, rule, omit) {
     var cvv = getValueWithNotation(validation);
     if (cvv) {
         try {
@@ -1668,122 +3665,323 @@ function validateCVV(validation, rule) {
     return false;
 }
 
-function getValueWithNotation(notation) {
-    try {
-        notation = notation.split('.');
-        var holder = app[notation[0]];
-        for (var i = 1; i < notation.length; i++) {
-            holder = holder[notation[i]];
-        }
-        return holder;
-    } catch (e) {
-        return null;
+function validateOTP(validation, rule, omit) {
+    var otp = getValueWithNotation(validation);
+    if (getValueWithNotation('helpers.avoidOtp')) {
+        return true;
+    } else {
+        return /\d{6}/.test(otp);
     }
 }
 
+function validateSurname(validation, rule, omit) {
+    var documentType = getValueWithNotation('payer.documentType');
+    if (documentType && p2p.businessDocumentTypes.indexOf(documentType) !== -1) {
+        return true;
+    } else {
+        var value = getValueWithNotation('payer.surname');
+        return !(!value || !getRegExp(namePattern).test(value));
+    }
+}
 
+var timeout;
 var app = new Vue({
     el: '#app',
     data: {
         step: 1,
+        wallet: p2p.wallet,
         payer: p2p.payer,
-        instrument: {},
+        instrument: {
+            card: {
+                name: null,
+                number: null,
+                expiration: null,
+                expirationMonth: null,
+                expirationYear: null,
+                installments: null,
+                cvv: null
+            },
+            credit: {
+                code: null,
+                type: null,
+                groupCode: null,
+                installment: null
+            },
+            otp: null
+        },
+        walletGateway: null,
         gateway: null,
         franchise: null,
-        payment: p2p.session.remaining,
+        fingerprint: null,
+        partialPayment: p2p.session.remaining,
         error: null,
         processing: true,
         expiration: p2p.expiration,
+        authorizeShare: false,
+        helpers: {
+            wOtp: null,
+            wTrust: true,
+            wError: null,
+            deleteMethod: null,
+            interest: null,
+            creditSelected: null,
+            creditTypes: null,
+            otpGenerated: false,
+            creditLoader: false,
+            interestLoader: false,
+            otpLoader: false,
+            dinersService: true,
+            avoidOtp: false
+        },
+        errorCount: 0,
         _token: p2p._token
     },
     methods: {
-        continueProcess: continueProcess,
+        payerContinue: payerContinue,
+        checkPayerEmail: checkPayerEmail,
+        cancelPayment: cancelPayment,
+        goBackMerchant: goBackMerchant,
         handleProceed: handleProceed,
-        goBackProcess: goBackProcess,
         selectGateway: selectGateway,
         handleAssignGanaPin: assignGanaPin,
-        increaseStep: function () {
-            this.step++;
-            if (this.step == 2) {
-                // If there is just one method, omit the selection
-                if ($("#payment-method-grid").find('.option').length == 1) {
-                    this.gateway = $("#payment-method-grid").find('.option').data('id');
-                    this.increaseStep();
-                }
+        dnCreditTypes: dnCreditTypes,
+        dnInterest: dnInterest,
+        authWallet: authWallet,
+        revokeWalletUser: revokeWalletUser,
+        selectMethod: function (method, b) {
+            if (app.helpers.deleteMethod) {
+                return true;
             }
-            return true;
+            if (method.disabled) {
+                return true;
+            }
+            if (app.methodSelected) {
+                resetSelectedPaymentMethod();
+            } else {
+                app.gateway = null;
+                app.wallet.method = method.id;
+                app.walletGateway = method.gateway;
+
+                if (method.gateway == 'card') {
+                    app.franchise = method.franchise;
+                } else if (method.gateway == 'diners') {
+                    app.franchise = method.franchise;
+                    dnCreditTypes();
+                }
+
+            }
         },
-        decreaseStep: function () {
-            this.step--;
-            if (this.step == 2) {
-                // If there is just one method, omit the selection
-                if ($("#payment-method-grid").find('.option').length == 1) {
-                    this.gateway = $("#payment-method-grid").find('.option').data('id');
-                    this.decreaseStep();
+        handleMethodRemove: function (method) {
+            // TODO: Remove the payment method
+            if (app.helpers.deleteMethod === null) {
+                app.helpers.deleteMethod = method.id;
+                timeout = setTimeout(function () {
+                    app.helpers.deleteMethod = null;
+                }, 5000);
+            } else {
+                if (app.helpers.deleteMethod === method.id) {
+                    clearTimeout(timeout);
+
+                    $.ajax({
+                        method: "POST",
+                        url: p2p.routes.walletRemove,
+                        data: {
+                            email: app.payer.email,
+                            method: app.helpers.deleteMethod,
+                            _token: p2p._token
+                        },
+                        dataType: "json",
+                        success: function (data) {
+                            resetSelectedPaymentMethod();
+
+                            app.wallet = data.wallet;
+                            if (data.payer) {
+                                app.payer = data.payer;
+                            }
+                        },
+                        error: function (data) {
+                            handleAjaxError(data);
+                        }
+                    });
+
+                } else {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function () {
+                        app.helpers.deleteMethod = null;
+                    }, 300);
                 }
             }
-            return true;
-        }
+        },
+        dnOtpGenerate: dnOtpGenerate
     },
     computed: {
         validCreditCard: function () {
-            if (this.gateway == 'card') {
-                return !(!this.franchise || p2p.availableCardFranchises.indexOf(this.franchise) == -1);
-            } else if (this.gateway == 'debit') {
-                return !(!this.franchise || p2p.availableDebitFranchises.indexOf(this.franchise) == -1);
-            } else {
-                return !!(this.franchise);
+            if (this.franchise) {
+                var availables = p2p.availableFranchises[this.gateway];
+                if (availables) {
+                    return availables.indexOf(this.franchise) !== -1;
+                }
             }
+            return false;
+        },
+        methodSelected: function () {
+            return !!(this.gateway || this.walletGateway);
         },
         partialAmount: function () {
             return p2p.session.currency + " $" + number_format(this.payment);
         },
         cvvLength: function () {
-            return this.franchise == 'amex' ? 4 : 3;
+            return this.franchise === 'amex' ? 4 : 3;
+        },
+        payerRegistered: function () {
+            return this.wallet.state === 'registered' || this.wallet.state === 'set';
+        },
+        payerUnknown: function () {
+            return this.wallet.state === 'unknown' || this.wallet.state === 'update';
+        },
+        displayFullPerson: function () {
+            return this.wallet.state === 'unregistered' || this.wallet.state === 'update';
+        },
+        isBusinessDocument: function () {
+            return !!(this.payer.documentType && (p2p.businessDocumentTypes.indexOf(this.payer.documentType) !== -1));
         }
     },
     ready: function () {
         this.processing = false;
         $('.validation').on('blur change', validationEventListener);
+
         makeCreditCardHelper(this);
         calculateExpiration(this, p2p);
         readyWallets(this, p2p);
+
+        new Fingerprint2().get(function (result, components) {
+            app.fingerprint = result;
+
+            if (validate('payer.name|payer.surname|payer.document|payer.email', true)) {
+                payerContinue();
+            }
+        });
+
+        if (p2p.isFrame) {
+            sendFrameMessage('ehlo', {});
+        }
     }
 });
 
-function continueProcess() {
-    console.log("HOLA");
-    var rules;
-    if (app.step == 1) {
-        if (p2p.restrictPayer) {
-            return app.increaseStep();
-        } else {
-            rules = [
-                'payer.email',
-                'payer.document',
-                'payer.documentType',
-                'payer.name',
-                'payer.surname',
-                'payer.mobile'
-            ];
-            // Validate the data
-            if (validate(rules.join('|'))) {
-                return app.increaseStep();
+function checkPayerEmail() {
+    var rules = [
+        'payer.email'
+    ];
+    if (validate(rules.join('|'))) {
+        $.ajax({
+            method: "POST",
+            url: p2p.routes.walletCheck,
+            data: {
+                email: app.payer.email,
+                _token: p2p._token
+            },
+            dataType: "json",
+            success: function (data) {
+                resetSelectedPaymentMethod();
+                app.wallet = data.wallet;
+                if (data.payer) {
+                    app.payer = data.payer;
+                }
+            },
+            error: function (data) {
+                handleAjaxError(data);
+                app.wallet.state = 'unregistered';
             }
+        });
+    }
+}
+
+function authWallet() {
+    var rules = [
+        'helpers.wOtp'
+    ];
+    if (validate(rules.join('|'))) {
+        $.ajax({
+            method: "POST",
+            url: p2p.routes.walletAuth,
+            data: {
+                id: app.wallet.id,
+                otp: app.helpers.wOtp,
+                trust: app.helpers.wTrust,
+                fingerprint: app.fingerprint,
+                email: app.payer.email,
+                _token: p2p._token
+            },
+            dataType: "json",
+            success: function (data) {
+                app.helpers.wError = null;
+                app.wallet.authorized = true;
+                $("#w_modal").modal('hide');
+                handleProceed();
+            },
+            error: function (data) {
+                var response = data.responseJSON.status;
+                if (response.reason === 'WC') {
+                    app.error = response.message;
+                    $("#w_modal").modal('hide');
+                    app.helpers.wError = null;
+                } else {
+                    app.helpers.wError = response.message;
+                }
+                app.helpers.wOtp = null;
+            }
+        });
+    }
+}
+
+function handleAjaxError(data) {
+    if (data.status === 408) {
+        location.reload();
+    } else if (data.status === 0) {
+        app.error = p2p.lang.connectionError;
+    } else if (data.responseJSON) {
+        var status = data.responseJSON.status;
+
+        // TODO: Improve
+        if (status.reason === 'OT') {
+            app.instrument.otp = null;
+            app.error = status.message;
+            app.errorCount++;
+            if (app.errorCount >= 4) {
+                alert(p2p.lang.maxErrorsReached);
+                cancelPayment();
+            }
+        } else if (status.reason === 'WA') {
+
+            $("#w_modal").modal();
+
+        } else {
+            app.error = status.message;
         }
-        return false;
-    } else if (app.step == 2) {
+
+        return status;
+    } else if (data.responseText) {
+        console.log(data);
+    }
+}
+
+function payerContinue() {
+    var rules;
+    if (app.payerUnknown) {
+        checkPayerEmail();
+    } else {
         rules = [
-            'gateway'
+            'payer.email',
+            'payer.document',
+            'payer.documentType',
+            'payer.name',
+            'payer.surname',
+            'payer.mobile'
         ];
-        if (p2p.isPartial) {
-            rules.push('payment');
-        }
-        // Check for a selected method
+        // Validate the data
         if (validate(rules.join('|'))) {
-            return app.increaseStep();
+            app.wallet.state = 'set';
         }
-        return false;
     }
 }
 
@@ -1791,26 +3989,35 @@ function handleProceed() {
     var gatewayRules = {
         'card': {
             rules: [
-                'instrument.number',
-                'instrument.expiration',
-                'instrument.cvv',
-                'instrument.installments'
+                'instrument.card.number',
+                'instrument.card.expiration',
+                'instrument.card.cvv',
+                'instrument.card.installments'
+            ],
+            additional: null
+        },
+        'codensa': {
+            rules: [
+                'instrument.card.number',
+                'instrument.card.expiration',
+                'instrument.card.cvv',
+                'instrument.card.installments'
             ],
             additional: null
         },
         'debit': {
             rules: [
-                'instrument.kind',
-                'instrument.number',
-                'instrument.expiration',
-                'instrument.cvv'
+                'instrument.card.number',
+                'instrument.card.kind',
+                'instrument.card.expiration',
+                'instrument.card.cvv'
             ],
             additional: null
         },
         'pse': {
             rules: [
-                'instrument.interface',
-                'instrument.code'
+                'instrument.bank.interface',
+                'instrument.bank.code'
             ],
             additional: null
         },
@@ -1820,16 +4027,16 @@ function handleProceed() {
         },
         'ris': {
             rules: [
-                'instrument.number',
-                'instrument.expiration',
+                'instrument.card.number',
+                'instrument.card.expiration',
                 'instrument.pin',
-                'instrument.installments'
+                'instrument.card.installments'
             ],
             additional: null
         },
         'ganapin': {
             rules: [
-                'instrument.password',
+                'instrument.password'
             ],
             additional: null
         },
@@ -1848,10 +4055,59 @@ function handleProceed() {
         'safetypay': {
             rules: [],
             additional: null
+        },
+        'diners': {
+            rules: [
+                'instrument.card.number',
+                'instrument.card.expiration',
+                'instrument.card.cvv',
+                'instrument.otp'
+            ],
+            additional: function () {
+                if (!p2p.isSubscription) {
+                    return validate('instrument.credit');
+                }
+                return true;
+            }
+        },
+        'account': {
+            rules: [
+                'instrument.bank.code',
+                'instrument.accountType',
+                'instrument.accountNumber'
+            ],
+            additional: null
         }
     };
 
-    var actualRules = gatewayRules[app.gateway];
+    var walletRules = {
+        'diners': {
+            rules: [
+                'instrument.card.cvv'
+            ],
+            additional: function () {
+                if (!p2p.isSubscription) {
+                    return validate('instrument.credit');
+                }
+                return true;
+            }
+        },
+        'card': {
+            rules: [
+                'instrument.card.cvv',
+                'instrument.card.installments'
+            ],
+            additional: null
+        }
+    };
+
+    var actualRules = null;
+    if (app.gateway) {
+        actualRules = gatewayRules[app.gateway];
+    } else if (app.walletGateway) {
+        actualRules = walletRules[app.walletGateway];
+    }
+
     if (!actualRules) {
         console.log("No rules defined for the gateway: " + app.gateway);
         return false;
@@ -1893,7 +4149,7 @@ function assignGanaPin() {
         dataType: "json",
         success: function (data) {
             pinWrapper.removeClass('invalid valid');
-            if (data.status != 'APPROVED') {
+            if (data.status !== 'APPROVED') {
                 pinWrapper.addClass('invalid');
                 pinMessage.html(data.message);
             } else {
@@ -1914,42 +4170,40 @@ function proceed() {
     app.processing = true;
 
     var timer;
+    var gateway = app.gateway;
+    if (!gateway) {
+        gateway = app.walletGateway;
+    }
     // At this point the input its valid
-    if (app.gateway == 'card' || app.gateway == 'debit') {
+    if (gateway === 'card' || gateway === 'debit' || gateway === 'diners') {
         // A timer to this particular payment method
         timer = setTimeout(function () {
             gotoState();
-        }, 10000);
+        }, 20000);
     }
 
-    if (app.instrument.expiration) {
-        var expirationSplit = app.instrument.expiration.split('/');
-        if (expirationSplit.length == 2) {
-            app.instrument.expiration_month = expirationSplit[0];
-            app.instrument.expiration_year = expirationSplit[1];
+    if (app.instrument.card.expiration) {
+        var expirationSplit = app.instrument.card.expiration.split('/');
+        if (expirationSplit.length === 2) {
+            app.instrument.card.expirationMonth = expirationSplit[0];
+            app.instrument.card.expirationYear = expirationSplit[1];
         }
     }
+
+    // Clone and b64 encode
+    var data = JSON.parse(JSON.stringify(app.$data));
+    data.instrument.card.number = cardEncode(data.instrument.card.number);
 
     $.ajax({
         method: "POST",
         url: p2p.routes.process,
-        data: app.$data,
+        data: data,
         dataType: "json",
         success: function (data) {
             location.href = data.url;
         },
         error: function (data) {
-            if (data.status == 408) {
-                location.reload();
-            } else if (data.status == 0) {
-                app.error = p2p.lang.connectionError;
-            } else {
-                if (data.responseJSON) {
-                    app.error = data.responseJSON.status.message;
-                } else if (data.responseText) {
-                    console.log(data);
-                }
-            }
+            handleAjaxError(data);
             clearTimeout(timer);
             app.processing = false;
         }
@@ -1957,19 +4211,196 @@ function proceed() {
 
 }
 
-function goBackProcess() {
-    if (app.error) {
-        app.error = null;
+function selectGateway(gateway) {
+    if (app.methodSelected) {
+        resetSelectedPaymentMethod();
+    } else {
+        if (gateway) {
+            app.gateway = gateway;
+        }
     }
-    $(".is-invalid").removeClass('is-invalid');
-    app.decreaseStep();
 }
 
-function selectGateway(gateway) {
-    if (gateway) {
-        app.gateway = gateway;
-        continueProcess();
+function gotoState() {
+    location.href = p2p.routes.state;
+}
+
+function dnCreditTypes() {
+    if (p2p.isSubscription) {
+        dnOtpGenerate();
+        return true;
     }
+
+    if (app.wallet.method) {
+        // Do nothing
+    } else {
+        var validationRules = {
+            rules: [
+                'instrument.card.number'
+            ],
+            additional: null
+        };
+
+        if (!validate(validationRules.rules.join('|'))) {
+            return false;
+        }
+    }
+
+    app.helpers.creditLoader = true;
+    $.ajax({
+        method: "POST",
+        url: p2p.routes.dnExtra,
+        data: {
+            'action': 'creditTypes',
+            'wallet': {
+                'id': app.wallet.id,
+                'method': app.wallet.method
+            },
+            'cardNumber': cardEncode(app.instrument.card.number),
+            '_token': p2p._token
+        },
+        dataType: "json",
+        success: function (data) {
+            app.helpers.creditLoader = false;
+            app.helpers.dinersService = data.service;
+            if (data.service) {
+                app.helpers.creditTypes = data.creditTypes;
+                app.instrument.credit = {};
+                app.instrument.otp = null;
+                dnOtpGenerate();
+            } else {
+                app.helpers.otpLoader = false;
+                app.helpers.otpGenerated = false;
+                app.helpers.creditTypes = null;
+                app.instrument.credit = data.creditTypes[0];
+                app.instrument.otp = '000000';
+            }
+        },
+        error: function (data) {
+            handleAjaxError(data);
+            app.helpers.creditLoader = false;
+        }
+    });
+}
+
+function dnInterest() {
+    if (p2p.isSubscription) {
+        return true;
+    }
+
+    var validationRules = {
+        rules: [
+            'instrument.credit'
+        ],
+        additional: null
+    };
+
+    if (!validate(validationRules.rules.join('|'))) {
+        return false;
+    }
+
+    app.helpers.interestLoader = true;
+    app.helpers.interest = null;
+    $.ajax({
+        method: "POST",
+        url: p2p.routes.dnExtra,
+        data: {
+            'action': 'interest',
+            'wallet': {
+                'id': app.wallet.id,
+                'method': app.wallet.method
+            },
+            'cardNumber': cardEncode(app.instrument.card.number),
+            'credit': app.instrument.credit,
+            '_token': p2p._token
+        },
+        dataType: "json",
+        success: function (data) {
+            app.helpers.interestLoader = false;
+            app.helpers.interest = data;
+        },
+        error: function (data) {
+            handleAjaxError(data);
+            app.helpers.interestLoader = false;
+        }
+    });
+}
+
+function dnOtpGenerate() {
+    if (app.wallet.method) {
+        return false;
+    } else {
+        var validationRules = {
+            rules: [
+                'instrument.card.number'
+            ],
+            additional: null
+        };
+
+        if (!validate(validationRules.rules.join('|'))) {
+            return false;
+        }
+    }
+
+    app.helpers.otpLoader = true;
+    app.helpers.avoidOtp = false;
+    $.ajax({
+        method: "POST",
+        url: p2p.routes.dnExtra,
+        data: {
+            'action': 'otpGenerate',
+            'wallet': {
+                'id': app.wallet.id,
+                'method': app.wallet.method
+            },
+            'cardNumber': cardEncode(app.instrument.card.number),
+            '_token': p2p._token
+        },
+        dataType: "json",
+        success: function (data) {
+            var generated = data.status.status == 'OK';
+            app.helpers.otpLoader = false;
+            app.helpers.otpGenerated = generated;
+            if (!generated) {
+                if (data.status.reason == 'NR') {
+                    app.helpers.avoidOtp = true;
+                } else {
+                    app.error = data.status.message;
+                }
+            }
+        },
+        error: function (data) {
+            handleAjaxError(data);
+            app.helpers.otpLoader = false;
+        }
+    });
+}
+
+function resetSelectedPaymentMethod() {
+    app.gateway = null;
+    app.walletGateway = null;
+    app.wallet.method = null;
+    app.franchise = null;
+    // TODO: Some kind of restore
+    app.helpers = {
+        interest: null,
+        creditSelected: null,
+        creditTypes: null,
+        otpGenerated: false,
+        creditLoader: false,
+        interestLoader: false,
+        otpLoader: false
+    };
+    app.instrument.card.number = null;
+    app.instrument.otp = null;
+}
+
+function revokeWalletUser() {
+    app.wallet.id = null;
+    app.wallet.state = 'unregistered';
+    app.wallet.methods = null;
+    app.wallet.method = null;
+    // TODO: make the call to really revoke
 }
 
 function onVisaCheckoutReady() {
@@ -2016,18 +4447,7 @@ function onVisaCheckoutReady() {
                     location.href = data.url;
                 },
                 error: function (data) {
-                    if (data.status == 408) {
-                        location.reload();
-                    } else if (data.status == 0) {
-                        app.error = p2p.lang.connectionError;
-                    } else {
-                        if (data.responseJSON) {
-                            app.error = data.responseJSON.status.message;
-                        } else if (data.responseText) {
-                            app.error = data.responseText;
-                            console.log(data);
-                        }
-                    }
+                    handleAjaxError(data);
                     app.processing = false;
                 }
             })
@@ -2095,7 +4515,7 @@ function readyWallets(app, p2p) {
                     app.processing = false;
                 },
                 error: function (data) {
-                    app.error = data.status.message;
+                    handleAjaxError(data);
                     app.processing = false;
                 }
             });

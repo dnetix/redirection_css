@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<!-- saved from url=(0072)http://local.dev/redirection/session/94/be21911aedb5e968c39d9c83c6a42c84 -->
+<!-- saved from url=(0073)http://local.dev/redirection/session/117/58a640fd2992b4173e48cc0281c043e7 -->
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Edición CSS de comercio</title>
+    <title></title>
 
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./index_files/font-awesome.min.css">
+    <link rel="shortcut icon" href="http://local.dev/redirection/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./index_files/style.css">
     <link rel="stylesheet" href="./style.css">
 </head>
-<body class="updated">
+<body class="created">
 
 <div class="full-wrapper ready" id="app">
 
@@ -30,85 +29,50 @@
             <div class="merchant-information">
                 <div class="container">
                     <div class="logo">
-                        <img src="./logo.png" alt="Enrique GarcÍa Molina">
+                        <img src="./logo.png" alt="Oral Health">
                     </div>
                     <div class="expiration">
-                        <p>El proceso de pago expirará <span id="expiration">en 2 años</span> <i
-                                class="fa fa-clock-o"></i></p>
+                        <p>Tu pago expirará <span id="expiration">en un día</span> <i class="fa fa-clock-o"></i></p>
                     </div>
                 </div>
                 <div class="receipt">
                     <div class="summary">
                         <div class="amount">
-                            <h4>Total a pagar</h4>
-                            <h2>COP $122,000</h2>
-                            <div class="mobile-reference">TEST_20170419_132942</div>
+                            <div class="amount-required">
+                                <h4>Total a pagar</h4>
+                                <h2>COP $119,000</h2>
+                            </div>
+                            <div class="mobile-reference">TEST_20171207_150954</div>
                         </div>
                     </div>
                     <div class="details">
                         <div class="detail reference">
                             <span>Referencia</span>
-                            <strong>TEST_20170419_132942</strong>
+                            <strong>TEST_20171207_150954</strong>
                         </div>
                         <div class="detail description">
                             <span>Descripción</span>
-                            <strong>Numquam qui accusamus harum enim.</strong>
+                            <strong>Saepe maiores aut aut est eum minus.</strong>
                         </div>
                         <div class="detail date">
                             <span>Fecha</span>
-                            <strong>2017-04-19 08:30:43</strong>
+                            <strong>2017-12-07 15:10:24</strong>
                         </div>
                         <div class="detail session">
                             <span>Sesión</span>
-                            <strong>94</strong>
+                            <strong>117</strong>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="progress-steps">
-                <div class="steps">
-                    <div id="step-1" class="step current">
-                        <div class="wrapper">
-                            <div class="s-icon">
-                                <i class="circle"></i>
-                                <i class="i-success fa fa-check"></i>
-                            </div>
-                            <div class="item">1. Datos del titular</div>
+                    <div class="messages">
+
+
+                        <div class="contact message">
+                            Si lo requieres puedes contactarte con la empresa en el correo electrónico dcallem88@msn.com
                         </div>
-                        <div class="line"></div>
-                    </div>
-                    <div id="step-2" class="step">
-                        <div class="wrapper">
-                            <div class="s-icon">
-                                <i class="circle"></i>
-                                <i class="i-success fa fa-check"></i>
-                            </div>
-                            <div class="item">2. Medio de pago</div>
-                        </div>
-                        <div class="line"></div>
-                    </div>
-                    <div id="step-3" class="step">
-                        <div class="wrapper">
-                            <div class="s-icon">
-                                <i class="circle"></i>
-                                <i class="i-success fa fa-check"></i>
-                            </div>
-                            <div class="item">3. pago</div>
-                        </div>
-                        <div class="line"></div>
-                    </div>
-                    <div id="step-4" class="step">
-                        <div class="wrapper">
-                            <div class="s-icon">
-                                <i class="circle"></i>
-                                <i class="i-success fa fa-check"></i>
-                            </div>
-                            <div class="item">4. Resultado</div>
-                        </div>
-                        <div class="line"></div>
                     </div>
                 </div>
+
             </div>
         </header>
 
@@ -117,642 +81,360 @@
             <div class="forms-wrapper col-xs-12 col-sm-7">
 
 
-                <div class="panel payer" v-bind:class="{ 'hidden': step != 1 }" id="panel-step-1">
+                <div class="panel wallet-user"
+                     v-bind:class="{ 'hidden': !payerRegistered, 'authorized': wallet.authorized }">
                     <div class="panel-heading">
-                        <h2 class="step-title">Datos del titular</h2>
-                        <p class="step-subtitle">Ingresa los datos de la persona que realizará el pago</p>
+                        <h2 class="step-title">Hola Peggie</h2>
+                        <p class="step-subtitle"><a href="javascript:;" v-on:click="revokeWalletUser">¿No eres tú? has
+                            clic aquí para ingresar tus
+                            datos</a></p>
+                    </div>
+                    <div class="wallet-logo"></div>
+                </div>
+
+                <div class="panel payer" v-bind:class="{ 'hidden': !payerUnknown && !displayFullPerson }">
+                    <div class="panel-heading">
+                        <h2 class="step-title">Cuentanos de ti</h2>
+                        <p class="step-subtitle">Necesitamos conocer unos datos de la persona que realizará el pago</p>
                     </div>
                     <div class="panel-body">
+
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="email" class="form-control validation" id="email" name="email"
-                                   v-model="payer.email" placeholder="example@example.com">
+                                   placeholder="example@example.com" v-model="payer.email">
                             <p class="error">Por favor ingrese un email válido, ej. usuario@proveedor.com, evita los
                                 espacios al inicio o final</p>
                         </div>
-                        <div class="form-group">
-                            <label for="documentType">Tipo de documento</label>
-                            <select id="document_type" class="form-control validation" name="document_type"
-                                    v-model="payer.documentType">
-                                <option value="">Selecciona</option>
-                                <option value="CC" selected="selected">Cédula ciudadanía</option>
-                                <option value="CE">Cédula extranjería</option>
-                                <option value="NIT">NIT</option>
-                                <option value="RUT">RUT</option>
-                                <option value="TI">Tarjeta identidad</option>
-                                <option value="SSN">Social security number</option>
-                                <option value="PPN">Pasaporte</option>
-                                <option value="CPF">Cadastro de Pessoas Físicas</option>
-                            </select>
-                            <p class="error">Por favor selecciona una de las opciones</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="document">Documento identidad</label>
-                            <input type="text" class="form-control validation" id="document" name="document"
-                                   v-model="payer.document" placeholder="ej. 1040000123">
-                            <p class="error">El número de documento no debe tener espacios, comas ni puntos</p>
-                            <span class="hint">Ingrese el número sin puntos, ni comas.</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Nombre</label>
-                            <input type="text" class="form-control validation" id="name" name="name"
-                                   placeholder="Nombre" v-model="payer.name">
-                            <p class="error">Por favor ingrese un nombre válido</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="surname">Apellidos</label>
-                            <input type="text" class="form-control validation" id="surname" name="surname"
-                                   placeholder="Apellido" v-model="payer.surname">
-                            <p class="error">Por favor ingrese un apellido válido</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="mobile">Celular</label>
-                            <input type="tel" class="form-control validation phone-number" id="mobile" name="mobile"
-                                   placeholder="ej. 3006100000" v-model="payer.mobile">
-                            <p class="error">Por favor ingrese un número telefónico válido, procure evitar los espacios
-                                y caracteres extraños</p>
+
+                        <div id="payer-full-data">
+                            <div class="form-group">
+                                <label for="documentType">Tipo de documento</label>
+                                <select id="document_type" class="form-control validation" name="document_type" v-model="payer.documentType">
+                                    <option value="">Selecciona</option>
+                                    <optgroup label="Colombia">
+                                        <option value="CC" selected="selected">Cédula ciudadanía</option>
+                                        <option value="CE">Cédula extranjería</option>
+                                        <option value="TI">Tarjeta identidad</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="RUT">RUT</option>
+                                    </optgroup>
+                                    <optgroup label="Internacional">
+                                        <option value="PPN">Pasaporte</option>
+                                        <option value="TAX">TAX</option>
+                                        <option value="LIC">LIC</option>
+                                    </optgroup>
+                                    <optgroup label="Estados Unidos">
+                                        <option value="SSN">Social security number</option>
+                                    </optgroup>
+                                    <optgroup label="Panamá">
+                                        <option value="CIP">Cédula de identidad personal</option>
+                                    </optgroup>
+                                    <optgroup label="Brasil">
+                                        <option value="CPF">Cadastro de Pessoas Físicas</option>
+                                    </optgroup>
+                                    <optgroup label="Ecuador">
+                                        <option value="CI">Cédula de identidad</option>
+                                        <option value="RUC">Registro único de contribuyente</option>
+                                    </optgroup>
+                                </select>
+                                <p class="error">Por favor selecciona una de las opciones</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="document">Número de documento</label>
+                                <input type="text" class="form-control validation" id="document" name="document"
+                                       placeholder="ej. 1040000123" v-model="payer.document">
+                                <p class="error">El número de documento no debe tener espacios, comas ni puntos</p>
+
+                                <span class="hint">Solo necesitamos el número, sin puntos, ni comas.</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Nombre</label>
+                                <input type="text" class="form-control validation" id="name" name="name"
+                                       placeholder="Nombre" v-model="payer.name">
+                                <p class="error">Por favor ingrese un nombre válido, no debe contener números, máximo 60
+                                    caracteres</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="surname">Apellidos</label>
+                                <input type="text" class="form-control validation" id="surname" name="surname"
+                                       placeholder="Apellido" v-model="payer.surname">
+                                <p class="error">Por favor ingrese un apellido válido, no debe contener números, máximo
+                                    60 caracteres</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile">Celular</label>
+                                <input type="tel" class="form-control validation phone-number" id="mobile" name="mobile"
+                                       placeholder="ej. 3006100000" v-model="payer.mobile">
+                                <p class="error">Por favor ingrese un número telefónico válido, procure evitar los
+                                    espacios y caracteres extraños y debe ser menor de 20 caracteres</p>
+                            </div>
                         </div>
 
-                        <div class="form-buttons">
-                            <button class="btn btn-primary" v-on:click="continueProcess">
-                                <i class="fa fa-chevron-right"></i>
-                                Continuar
+                        <div class="form-group submit-buttons">
+                            <button type="button" class="btn btn-secondary" v-on:click="payerContinue">Continuar
                             </button>
                         </div>
+
                     </div>
                 </div>
 
-                <div class="panel hidden" v-bind:class="{ 'hidden': step != 2 }" id="panel-step-2">
+
+                <div class="panel" v-bind:class="{ 'hidden': !payerRegistered }">
                     <div class="panel-heading">
-                        <h2 class="step-title">Medio de pago</h2>
-                        <p class="step-subtitle">Selecciona el método con el que pagarás la compra</p>
+                        <h2 class="step-title">Elige el medio de pago</h2>
+                        <p class="step-subtitle">Selecciona el método con el que realizaras la compra</p>
                     </div>
                     <div class="panel-body">
 
-                        <div class="payment-methods-grid form-group" id="payment-method-grid">
-                            <div class="option card" data-id="card" v-on:click="selectGateway('card')">
-                                <div class="check"><i class="fa fa-check"></i></div>
+                        <div class="form-group" id="payment-methods" v-bind:class="{ 'already': methodSelected, 'delete': helpers.deleteMethod }">
+                            <div class="option card" v-bind:class="{ 'selected': gateway == 'card' }" data-id="card"
+                                 v-on:click="selectGateway('card')">
                                 <div class="icon"></div>
                                 <div class="text">Tarjeta de crédito</div>
                             </div>
-                            <div class="option debit" data-id="debit" v-on:click="selectGateway('debit')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">Tarjeta débito Visa Electron</div>
-                            </div>
-                            <div class="option pse" data-id="pse" v-on:click="selectGateway('pse')">
-                                <div class="check"><i class="fa fa-check"></i></div>
+                            <div class="option pse" v-bind:class="{ 'selected': gateway == 'pse' }" data-id="pse"
+                                 v-on:click="selectGateway('pse')">
                                 <div class="icon"></div>
                                 <div class="text">Cuentas débito ahorro y corriente (PSE)</div>
                             </div>
-                            <div class="option cash" data-id="cash" v-on:click="selectGateway('cash')">
-                                <div class="check"><i class="fa fa-check"></i></div>
+                            <div class="option cash" v-bind:class="{ 'selected': gateway == 'cash' }" data-id="cash"
+                                 v-on:click="selectGateway('cash')">
                                 <div class="icon"></div>
                                 <div class="text">Pago en efectivo</div>
                             </div>
-                            <div class="option ganapin" data-id="ganapin" v-on:click="selectGateway('ganapin')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">GANA Pin</div>
-                            </div>
-                            <div class="option ris" data-id="ris" v-on:click="selectGateway('ris')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">Tarjeta RIS</div>
-                            </div>
-                            <div class="option paypal" data-id="paypal" v-on:click="selectGateway('paypal')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">PayPal</div>
-                            </div>
-                            <div class="option alkosto" data-id="alkosto" v-on:click="selectGateway('alkosto')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">Tarjeta Alkosto</div>
-                            </div>
-                            <div class="option safetypay" data-id="safetypay" v-on:click="selectGateway('safetypay')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">Safety Pay</div>
-                            </div>
-                            <div class="option exito" data-id="exito" v-on:click="selectGateway('exito')">
-                                <div class="check"><i class="fa fa-check"></i></div>
-                                <div class="icon"></div>
-                                <div class="text">Tarjeta Éxito</div>
-                            </div>
+                            <p class="hint delete-pm">Si quieres borrar este medio clickea de nuevo, si no, solo espera
+                                unos segundos</p>
+                            <p class="hint select-pm">¿No era este el medio? no hay problema, clickealo de nuevo</p>
                             <p class="error">Por favor selecciona una de las opciones</p>
                         </div>
-                        <div class="form-buttons">
-                            <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar</button>
-                            <button class="btn btn-primary" v-on:click="continueProcess">
-                                <i class="fa fa-chevron-right"></i>
-                                Continuar
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="panel hidden" v-bind:class="{ 'hidden': step != 3 }" id="panel-step-3">
-                    <div class="panel-heading">
-                        <h2 class="step-title">Pago</h2>
-                        <p class="step-subtitle">Ingrese datos del medio de pago</p>
-                    </div>
-                    <div class="panel-body">
-
-                        <div class="tabs-holder" id="service-forms">
-                            <div class="tab-pane method" id="method_card" data-gateway="card"
-                                 v-bind:class="{ 'active': gateway == 'card' }">
-                                <div class="available_franchises">
-                                    <p class="hint">Se aceptan pagos de las siguientes franquicias</p>
-                                    <div class="images">
-                                        <img class="franchise" src="./index_files/franchise_CR_AM.png" alt="CR_AM">
-                                        <img class="franchise" src="./index_files/franchise_CR_DN.png" alt="CR_DN">
-                                        <img class="franchise" src="./index_files/franchise_CR_VS.png" alt="CR_VS">
-                                        <img class="franchise" src="./index_files/franchise_RM_MC.png" alt="RM_MC">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="card-validator">
-                                        <label for="card_number">Número de tarjeta</label>
-                                        <input type="number" name="card_number" id="card_number"
-                                               class="form-control card-input validation"
-                                               placeholder="1234 5678 9012 3456" required="required" autocomplete="off"
-                                               maxlength="19" v-model="instrument.number">
-                                        <p class="error">Valida que el número se encuentre correcto y que la franquicia
-                                            esté habilitada</p>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="card_expiration">Fecha vencimiento</label>
-                                    <input type="text" name="card_expiration" id="card_expiration"
-                                           class="form-control expiration-input validation" placeholder="MM/YY"
-                                           required="required" autocomplete="off" maxlength="5"
-                                           v-model="instrument.expiration">
-                                    <p class="error">La fecha de expiración es de la forma MM/YY y debe estar vigente y
-                                        no ser mayor a 10 años</p>
-                                    <span class="hint">Solo ingresa los números, la barra (/) es automática</span>
-                                </div>
-                                <div class="form-group">
-                                    <label for="card_cvv">Código de seguridad</label>
-                                    <div class="input-group">
-                                        <input type="number" name="card_cvv" id="card_cvv" v-model="instrument.cvv"
-                                               class="form-control cvv-input validation" placeholder="CVV"
-                                               required="required" autocomplete="off" maxlength="3">
-                                        <div class="input-group-addon cvv-helper has-tooltip">
-                                            <i class="fa fa-question"></i>
-                                            <div class="cvv tooltip">
-                                                <h5>Mira donde encuentras el código de seguridad en tu tarjeta</h5>
-                                                <div class="rear">
-                                                    <p>Si es Visa / Mastercard / Diners Club</p>
-                                                    <img src="./index_files/cvv_rear.png" alt="">
-                                                </div>
-                                                <div class="front">
-                                                    <p>Si es American Express</p>
-                                                    <img src="./index_files/cvv_front.png" alt="">
-                                                </div>
-                                            </div>
+                        <div class="payment-method-data">
+                            <div class="tabs-holder" id="service-forms">
+                                <div class="tab-pane method" id="method_card" data-gateway="card" v-bind:class="{ 'active': gateway == 'card' }">
+                                    <div class="available_franchises">
+                                        <p class="hint">Se aceptan pagos de las siguientes franquicias</p>
+                                        <div class="images">
+                                            <img class="franchise"
+                                                 src="./index_files/franchise_CR_VS.png"
+                                                 alt="CR_VS">
                                         </div>
                                     </div>
-                                    <p class="error">Puedes hacer clic en el signo de interrogación para obtener ayuda
-                                        sobre este item</p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="card_installments">Cuotas</label>
-                                    <select id="card_installments" class="form-control validation"
-                                            name="card_installments" v-model="instrument.installments">
-                                        <option selected="selected" value="">Selecciona</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                        <option value="24">24</option>
-                                        <option value="25">25</option>
-                                        <option value="26">26</option>
-                                        <option value="27">27</option>
-                                        <option value="28">28</option>
-                                        <option value="29">29</option>
-                                        <option value="30">30</option>
-                                        <option value="31">31</option>
-                                        <option value="32">32</option>
-                                        <option value="33">33</option>
-                                        <option value="34">34</option>
-                                        <option value="35">35</option>
-                                        <option value="36">36</option>
-                                    </select>
-                                    <p class="error">Por favor selecciona una de las opciones</p>
-                                </div>
-                                <div class="promotions">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="card"
-                                            v-on:click="selectGateway('card')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_debit" data-gateway="debit"
-                                 v-bind:class="{ 'active': gateway == 'debit' }">
-                                <div class="available_franchises">
-                                    <p class="hint">Solo se aceptan tarjetas débito de los bancos habilitados</p>
-                                    <div class="images">
-                                        <img class="franchise" src="./index_files/franchise_CR_VE.png" alt="CR_VE">
-                                        <img src="./index_files/franchise_AV_BB.png" alt="AV_BB">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="debit_kind">Tipo cuenta</label>
-                                    <select id="debit_kind" class="form-control" name="debit_kind">
-                                        <option selected="selected" value="">Selecciona</option>
-                                        <option value="A">Cuenta ahorros</option>
-                                        <option value="R">Cuenta corriente</option>
-                                    </select>
-                                    <p class="error">Por favor selecciona un tipo de cuenta</p>
-                                </div>
-                                <div class="form-group">
-                                    <div class="card-validator">
-                                        <label for="debit_number">Número de tarjeta</label>
-                                        <input type="number" name="debit_number" id="debit_number"
-                                               class="form-control card-input validation"
-                                               placeholder="1234 5678 9012 3456" required="required" autocomplete="off"
-                                               maxlength="19">
-                                        <p class="error">Valida que el número se encuentre correcto y que la franquicia
-                                            esté habilitada</p>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="debit_expiration">Fecha vencimiento</label>
-                                    <input type="text" name="debit_expiration" id="debit_expiration"
-                                           class="form-control expiration-input validation" placeholder="MM/YY"
-                                           required="required" autocomplete="off" maxlength="5">
-                                    <p class="error">La fecha de expiración es de la forma MM/YY y debe estar vigente y
-                                        no ser mayor a 10 años</p>
-                                    <span class="hint">Solo ingresa los números, la barra (/) es automática</span>
-                                </div>
-                                <div class="form-group">
-                                    <label for="debit_cvv">Código de seguridad</label>
-                                    <div class="input-group">
-                                        <input type="password" name="debit_cvv" id="debit_cvv"
-                                               class="form-control number-input validation" placeholder="CVV"
-                                               required="required" autocomplete="off" maxlength="3">
-                                        <div class="input-group-addon cvv-helper has-tooltip">
-                                            <i class="fa fa-question"></i>
-                                            <div class="cvv tooltip">
-                                                <h5>Mira donde encuentras el código de seguridad en tu tarjeta</h5>
-                                                <div class="rear">
-                                                    <p>Si es Visa / Mastercard / Diners Club</p>
-                                                    <img src="./index_files/cvv_rear.png" alt="">
-                                                </div>
-                                                <div class="front">
-                                                    <p>Si es American Express</p>
-                                                    <img src="./index_files/cvv_front.png" alt="">
-                                                </div>
-                                            </div>
+                                    <div class="form-group">
+                                        <div class="card-validator">
+                                            <label for="card_number">Número de tarjeta</label>
+                                            <input type="number" name="card_number" id="card_number"
+                                                   class="form-control card-input validation"
+                                                   placeholder="1234 5678 9012 3456" required="required"
+                                                   autocomplete="off" maxlength="19" v-model="instrument.card.number">
+                                            <p class="error">Valida que el número se encuentre correcto y que la
+                                                franquicia esté habilitada</p>
                                         </div>
                                     </div>
-                                    <p class="error">Puedes hacer clic en el signo de interrogación para obtener ayuda
-                                        sobre este item</p>
-                                </div>
-                                <div class="promotions">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="debit"
-                                            v-on:click="selectGateway('debit')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_pse" data-gateway="pse"
-                                 v-bind:class="{ 'active': gateway == 'pse' }">
-                                <div class="form-group">
-                                    <label for="pse_bank_interface">Tipo de Persona</label>
-                                    <select id="pse_bank_interface" class="form-control" name="pse_bank_interface">
-                                        <option value="">Selecciona</option>
-                                        <option value="0" selected="selected">Personas</option>
-                                        <option value="1">Empresas</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="pse_bank_code">Banco</label>
-                                    <select id="pse_bank_code" class="form-control" name="pse_bank_code">
-                                        <option selected="selected" value="">Selecciona</option>
-                                        <option value="1040">BANCO AGRARIO</option>
-                                        <option value="1081">BANCO AGRARIO DESARROLLO</option>
-                                        <option value="1080">BANCO AGRARIO QA DEFECTOS</option>
-                                        <option value="1032">BANCO CAJA SOCIAL DESARROLLO</option>
-                                        <option value="1019">BANCO COLPATRIA DESARROLLO</option>
-                                        <option value="1078">BANCO COLPATRIA UAT</option>
-                                        <option value="1052">BANCO COMERCIAL AVVILLAS S.A.</option>
-                                        <option value="1061">BANCO COOMEVA S.A. - BANCOOMEVA</option>
-                                        <option value="1016">BANCO COOPERATIVO COOPCENTRAL</option>
-                                        <option value="1006">BANCO CORPBANCA (Migracion)</option>
-                                        <option value="1051">BANCO DAVIVIENDA</option>
-                                        <option value="1039">BANCO DE BOGOTA</option>
-                                        <option value="8888">BANCO DE BOGOTA 3.0</option>
-                                        <option value="1001">BANCO DE BOGOTA DESARROLLO 2013</option>
-                                        <option value="1037">BANCO DE BOGOTA PRUEBAS 3.0</option>
-                                        <option value="3333">BANCO DE BOGOTA PRUEBAS 3.0</option>
-                                        <option value="1023">BANCO DE OCCIDENTE</option>
-                                        <option value="1062">BANCO FALABELLA</option>
-                                        <option value="1010">BANCO GNB COLOMBIA (ANTES HSBC)</option>
-                                        <option value="1012">BANCO GNB SUDAMERIS</option>
-                                        <option value="1060">BANCO PICHINCHA S.A.</option>
-                                        <option value="1002">BANCO POPULAR</option>
-                                        <option value="1092">BANCO POPULAR WSE 3.0</option>
-                                        <option value="1058">BANCO PROCREDIT COLOMBIA</option>
-                                        <option value="1101">Banco PSE</option>
-                                        <option value="1035">BANCO TEQUENDAMA</option>
-                                        <option value="1022">BANCO UNION COLOMBIANO</option>
-                                        <option value="1055">Banco Web Service ACH WSE 3.0</option>
-                                        <option value="10072">BANCOLOMBIA DATAPOWER</option>
-                                        <option value="10071">BANCOLOMBIA DESARROLLO</option>
-                                        <option value="1007">BANCOLOMBIA QA</option>
-                                        <option value="1013">BBVA COLOMBIA S.A.</option>
-                                        <option value="1009">CITIBANK COLOMBIA S.A.</option>
-                                        <option value="1014">HELM BANK S.A. WSE 3.0</option>
-                                        <option value="1098">HELM BANK S.A...</option>
-                                        <option value="1507">NEQUI</option>
-                                        <option value="1508">NEQUI CERTIFICACION</option>
-                                        <option value="121212">Prueba Steve</option>
-                                    </select>
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="pse"
-                                            v-on:click="selectGateway('pse')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_cash" data-gateway="cash"
-                                 v-bind:class="{ 'active': gateway == 'cash' }">
-                                <p class="logos"><img src="./index_files/cash_partners.png" alt="Pago en efectivo"></p>
-                                <div class="description"><p>Pague con efectivo en diferentes redes de recaudo como vía
-                                    Baloto, Efecty, cajas de los supermercados Éxito, Carulla, Surtimax y Super Inter;
-                                    en cualquiera de los corresponsales bancarios del grupo AVAL; o en cualquier cajero
-                                    electrónico ATH del Grupo AVAL (Banco de Bogotá, Banco de Occidente, Banco Popular,
-                                    AV Villas).</p>
-                                    <p>Al escoger esta opción a su correo electrónico le llegará un documento PDF con
-                                        las instrucciones para el pago y los puntos habilitados, tenga en cuenta que
-                                        podrá pagar esta referencia de pago hasta el <strong>2019-04-19
-                                            08:49:42</strong></p></div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="cash"
-                                            v-on:click="selectGateway('cash')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_ganapin" data-gateway="ganapin"
-                                 v-bind:class="{ 'active': gateway == 'ganapin' }">
-                                <div class="form-group">
-                                    <label for="ganapin_username">Usuario</label>
-                                    <input id="ganapin_username" placeholder="Usuario" class="form-control"
-                                           readonly="readonly" name="ganapin_username" type="text">
-                                </div>
-                                <div class="form-group">
-                                    <label for="ganapin_password">Contraseña</label>
-                                    <input id="ganapin_password" placeholder="Contraseña" class="form-control"
-                                           name="ganapin_password" type="password" value="">
-                                    <p class="error">Por favor ingresa la contraseña de tu usuario en GANA</p>
-                                </div>
-                                <div class="row ganapin-charge">
-                                    <div class="col-sm-3">
-                                        <div class="partner">
-                                            <img src="./index_files/ganapin_logo.png" alt="redirection.gana_logo"
-                                                 class="img-responsive">
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="card_expiration">Fecha vencimiento</label>
+                                        <input type="text" name="card_expiration" id="card_expiration"
+                                               class="form-control expiration-input validation" placeholder="MM/YY"
+                                               required="required" autocomplete="off" maxlength="5">
+                                        <p class="error">La fecha de expiración es de la forma MM/YY y debe estar
+                                            vigente y no ser mayor a 10 años</p>
+                                        <span class="hint">Solo ingresa los números, la barra (/) es automática</span>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <div class="well" id="ganapin_well">
-                                            <div class="text-center description">
-                                                <span><strong>Opcional</strong>, asigna pines para recargar el saldo de tu cuenta antes de continuar con el pago </span>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="input-group">
-                                                    <input id="ganapin_pin" placeholder="Código PIN"
-                                                           class="form-control" name="ganapin_pin" type="text">
-                                                    <div class="input-group-btn">
-                                                        <button type="button" class="btn btn-primary btn-process"
-                                                                data-id="ganapin" v-on:click="selectGateway('ganapin')">
-                                                            Cargar PIN
-                                                        </button>
+                                    <div class="form-group">
+                                        <label for="card_cvv">Código de seguridad</label>
+                                        <div class="input-group">
+                                            <input type="password" name="card_cvv" id="card_cvv"
+                                                   class="form-control cvv-input validation" placeholder="CVV"
+                                                   required="required" autocomplete="off" maxlength="3">
+                                            <div class="input-group-addon cvv-helper has-tooltip">
+                                                <i class="fa fa-question"></i>
+                                                <div class="cvv tooltip">
+                                                    <h5>Mira donde encuentras el código de seguridad en tu tarjeta</h5>
+                                                    <div class="rear">
+                                                        <p>Si es Visa / Mastercard / Diners Club / Discover</p>
+                                                        <img src="./index_files/cvv_rear.png"
+                                                             alt="">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="ganapin_message"></div>
+                                        </div>
+                                        <p class="error">Puedes hacer clic en el signo de interrogación para obtener
+                                            ayuda sobre este item</p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="card_installments">Cuotas</label>
+                                        <select id="card_installments" class="form-control validation"
+                                                name="card_installments">
+                                            <option selected="selected" value="">Selecciona</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                            <option value="25">25</option>
+                                            <option value="26">26</option>
+                                            <option value="27">27</option>
+                                            <option value="28">28</option>
+                                            <option value="29">29</option>
+                                            <option value="30">30</option>
+                                            <option value="31">31</option>
+                                            <option value="32">32</option>
+                                            <option value="33">33</option>
+                                            <option value="34">34</option>
+                                            <option value="35">35</option>
+                                            <option value="36">36</option>
+                                        </select>
+                                        <p class="error">Por favor selecciona una de las opciones</p>
+                                    </div>
+                                    <div class="disclosure">
+                                        <p>Cualquier persona que realice un compra en el sitio, actuando libre y
+                                            voluntariamente, autoriza a <strong>Oral Health</strong>, a través del
+                                            proveedor del servicio <strong>EGM Ingeniería Sin Fronteras S.A.S y/o Place
+                                                to Pay</strong> para que consulte y solicite información del
+                                            comportamiento crediticio, financiero, comercial y de servicios a terceros,
+                                            incluso en países de la misma naturaleza en las centrales de riesgo,
+                                            generándose una huella de consulta.</p>
+                                        <p>Al continuar acepto la <a target="_blank"
+                                                                     href="https://www.placetopay.com/wp-content/uploads/politicas.pdf">política
+                                            de protección</a> de datos personales de <strong>EGM Ingeniería Sin
+                                            Fronteras S.A.S y/o Place to Pay</strong></p>
+                                    </div>
+
+                                    <div class="register-pm">
+                                        <div class="form-group group-checkbox">
+                                            <label for="register">
+                                                <span>¿Quieres que guardemos este medio de pago para que no tengas que ingresarlo nuevamente?</span>
+                                                <i class="fa"></i>
+                                                <input type="checkbox" id="register" value="1">
+                                            </label>
+                                            <p class="hint">Solo necesitas clickear y estará muy seguro, nuestra
+                                                certificación PCI lo comprueba</p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="ganapin"
-                                            v-on:click="selectGateway('ganapin')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar con el pago
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_ris" data-gateway="ris"
-                                 v-bind:class="{ 'active': gateway == 'ris' }">
-                                <div class="form-group">
-                                    <div class="card-validator">
-                                        <label for="ris_number">Número de tarjeta</label>
-                                        <input type="number" name="ris_number" id="ris_number"
-                                               class="form-control card-input validation"
-                                               placeholder="1234 5678 9012 3456" required="required" autocomplete="off"
-                                               maxlength="19">
-                                        <p class="error">redirection.validation_ris_number</p>
+
+                                    <div class="form-group submit-buttons">
+                                        <button type="button" class="btn btn-primary btn-process" data-id="card">
+                                            <i class="fa fa-lock"></i>
+                                            Continuar
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="ris_expiration">Fecha vencimiento</label>
-                                    <input type="text" name="ris_expiration" id="ris_expiration"
-                                           class="form-control expiration-input validation" placeholder="MM/YY"
-                                           required="required" autocomplete="off" maxlength="5">
-                                    <p class="error">redirection.validation_ris_expiration</p>
-                                    <span class="hint">Solo ingresa los números, la barra (/) es automática</span>
+                                <div class="tab-pane method" id="method_pse" data-gateway="pse" v-bind:class="{ 'active': gateway == 'pse' }">
+                                    <div class="form-group">
+                                        <label for="pse_bank_interface">Tipo de Persona</label>
+                                        <select id="pse_bank_interface" class="form-control" name="pse_bank_interface">
+                                            <option value="">Selecciona</option>
+                                            <option value="0" selected="selected">Personas</option>
+                                            <option value="1">Empresas</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pse_bank_code">Banco</label>
+                                        <select id="pse_bank_code" class="form-control" name="pse_bank_code">
+                                            <option selected="selected" value="">Selecciona</option>
+                                            <option value="0">A continuación seleccione su banco</option>
+                                            <option value="1552">BAN.CO</option>
+                                            <option value="1040">BANCO AGRARIO</option>
+                                            <option value="1081">BANCO AGRARIO DESARROLLO</option>
+                                            <option value="1080">BANCO AGRARIO QA DEFECTOS</option>
+                                            <option value="10322">BANCO CAJA SOCIAL</option>
+                                            <option value="1032">BANCO CAJA SOCIAL DESARROLLO</option>
+                                            <option value="1019">BANCO COLPATRIA DESARROLLO</option>
+                                            <option value="1078">BANCO COLPATRIA UAT</option>
+                                            <option value="1052">BANCO COMERCIAL AVVILLAS S.A.</option>
+                                            <option value="1061">BANCO COOMEVA S.A. - BANCOOMEVA</option>
+                                            <option value="1016">BANCO COOPERATIVO COOPCENTRAL</option>
+                                            <option value="1006">BANCO CORPBANCA (Migracion)</option>
+                                            <option value="1051">BANCO DAVIVIENDA</option>
+                                            <option value="10512">BANCO DAVIVIENDA Desarrollo</option>
+                                            <option value="1001">BANCO DE BOGOTA DESARROLLO 2013</option>
+                                            <option value="1023">BANCO DE OCCIDENTE</option>
+                                            <option value="1062">BANCO FALABELLA</option>
+                                            <option value="1010">BANCO GNB COLOMBIA (ANTES HSBC)</option>
+                                            <option value="1012">BANCO GNB SUDAMERIS</option>
+                                            <option value="1060">BANCO PICHINCHA S.A.</option>
+                                            <option value="1002">BANCO POPULAR</option>
+                                            <option value="1058">BANCO PROCREDIT COLOMBIA</option>
+                                            <option value="1101">Banco PSE</option>
+                                            <option value="1065">BANCO SANTANDER COLOMBIA</option>
+                                            <option value="1035">BANCO TEQUENDAMA</option>
+                                            <option value="1022">BANCO UNION COLOMBIANO</option>
+                                            <option value="1055">Banco Web Service ACH WSE 3.0</option>
+                                            <option value="10072">BANCOLOMBIA DATAPOWER</option>
+                                            <option value="10071">BANCOLOMBIA DESARROLLO</option>
+                                            <option value="1007">BANCOLOMBIA QA</option>
+                                            <option value="1013">BBVA COLOMBIA S.A.</option>
+                                            <option value="1009">CITIBANK COLOMBIA S.A.</option>
+                                            <option value="1014">HELM BANK S.A. WSE 3.0</option>
+                                            <option value="1098">HELM BANK S.A...</option>
+                                            <option value="1508">NEQUI CERTIFICACION</option>
+                                            <option value="121212">Prueba Steve</option>
+                                        </select>
+                                    </div>
+                                    <div class="disclosure">
+                                        <p>Al continuar acepto la <a target="_blank"
+                                                                     href="https://www.placetopay.com/wp-content/uploads/politicas.pdf">política
+                                            de protección</a> de datos personales de <strong>EGM Ingeniería Sin
+                                            Fronteras S.A.S y/o Place to Pay</strong></p>
+                                    </div>
+                                    <div class="form-group submit-buttons">
+                                        <button type="button" class="btn btn-primary btn-process" data-id="pse">
+                                            <i class="fa fa-lock"></i>
+                                            Continuar
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="ris_pin">PIN</label>
-                                    <input type="password" name="ris_pin" id="ris_pin"
-                                           class="form-control pin-input validation" placeholder="Clave"
-                                           required="required" maxlength="5">
-                                    <p class="error">redirection.validation_ris_pin</p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="ris_installments">Cuotas</label>
-                                    <select id="ris_installments" class="form-control validation"
-                                            name="ris_installments">
-                                        <option selected="selected" value="">Selecciona</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                        <option value="24">24</option>
-                                        <option value="25">25</option>
-                                        <option value="26">26</option>
-                                        <option value="27">27</option>
-                                        <option value="28">28</option>
-                                        <option value="29">29</option>
-                                        <option value="30">30</option>
-                                        <option value="31">31</option>
-                                        <option value="32">32</option>
-                                        <option value="33">33</option>
-                                        <option value="34">34</option>
-                                        <option value="35">35</option>
-                                        <option value="36">36</option>
-                                    </select>
-                                    <p class="error">Por favor selecciona una de las opciones</p>
-                                </div>
-                                <div class="partner">
-                                    <img src="./index_files/tarjeta_ris_logo.png" alt="redirection.ris_logo"
-                                         class="img-responsive">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="ris"
-                                            v-on:click="selectGateway('ris')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_paypal" data-gateway="paypal"
-                                 v-bind:class="{ 'active': gateway == 'paypal' }">
-                                <div class="description"><p>PayPal is a global service that allows you to send payments
-                                    to the seller's account with your credit card, but without sharing your financial
-                                    information. Pay easily and securely in millions of online stores by simply
-                                    providing your email and password.</p></div>
-                                <div class="partner">
-                                    <img src="./index_files/paypal_partners.png" alt="PayPal" class="img-responsive">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="paypal"
-                                            v-on:click="selectGateway('paypal')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_alkosto" data-gateway="alkosto"
-                                 v-bind:class="{ 'active': gateway == 'alkosto' }">
-                                <div class="description"><p>Con la Tarjeta Alkosto tienes hiper descuentos exclusivos
-                                    todas las semanas del año, además solo pagas cuota de manejo si tienes saldo para
-                                    pago y/o utilizaciones durante el mes.</p></div>
-                                <div class="partner">
-                                    <img src="./index_files/alkosto_partners.png" alt="Tarjeta Tuya"
-                                         class="img-responsive">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="alkosto"
-                                            v-on:click="selectGateway('alkosto')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_safetypay" data-gateway="safetypay"
-                                 v-bind:class="{ 'active': gateway == 'safetypay' }">
-                                <div class="description"><p>SafetyPay le permite comprar en comercios de todo el mundo
-                                    así como pagar por bienes y servicios en su moneda local sin necesidad de una
-                                    tarjeta de crédito. Si su banco ofrece SafetyPay, sólo necesita conectarse al
-                                    servicio de banca online de su entidad bancaria y ya puede pagar.</p></div>
-                                <div class="partner">
-                                    <img src="./index_files/safetypay_partners.png" alt="Safety Pay"
-                                         class="img-responsive">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="safetypay"
-                                            v-on:click="selectGateway('safetypay')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="tab-pane method" id="method_exito" data-gateway="exito"
-                                 v-bind:class="{ 'active': gateway == 'exito' }">
-                                <div class="description"><p>Tarjeta Éxito te permite acceder a un cupo de crédito, con
-                                    ingresos desde un salario mínimo y que puedas con buen manejo, construir historial
-                                    crediticio y abrir las puertas del sector financiero.</p></div>
-                                <div class="partner">
-                                    <img src="./index_files/exito_partners.png" alt="Tarjeta Tuya"
-                                         class="img-responsive">
-                                </div>
-                                <div class="form-group submit-buttons">
-                                    <button type="button" class="btn btn-default" v-on:click="goBackProcess">Regresar
-                                    </button>
-                                    <button type="button" class="btn btn-primary btn-process" data-id="exito"
-                                            v-on:click="selectGateway('exito')">
-                                        <i class="fa fa-lock"></i>
-                                        Continuar
-                                    </button>
+                                <div class="tab-pane method" id="method_cash" data-gateway="cash" v-bind:class="{ 'active': gateway == 'cash' }">
+                                    <div class="logos">
+                                        <img class="franchise"
+                                             src="./index_files/cash__ATH_.png" alt="_ATH_">
+                                    </div>
+                                    <div class="description"><p>Pague con efectivo en las diferentes redes de recaudo
+                                        disponibles.</p>
+                                        <p>Al escoger esta opción a su correo electrónico le llegará un documento PDF
+                                            con las instrucciones para el pago y los puntos habilitados, tenga en cuenta
+                                            que podrá pagar esta referencia de pago hasta el <strong>2017-12-08
+                                                15:09:54</strong></p></div>
+                                    <div class="disclosure">
+                                        <p>Al continuar acepto la <a target="_blank"
+                                                                     href="https://www.placetopay.com/wp-content/uploads/politicas.pdf">política
+                                            de protección</a> de datos personales de <strong>EGM Ingeniería Sin
+                                            Fronteras S.A.S y/o Place to Pay</strong></p>
+                                    </div>
+                                    <div class="form-group submit-buttons">
+                                        <button type="button" class="btn btn-primary btn-process" data-id="cash">
+                                            <i class="fa fa-lock"></i>
+                                            Continuar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
                 <div class="cancel-payment">
-                    <a class="btn btn-default btn-link"
-                       href="https://www.placetopay.com"
-                       id="cancel-button">
+                    <a class="btn btn-default btn-link" href="javascript:;" id="cancel-button">
                         <i class="fa fa-times"></i>
                         No deseo continuar el proceso
                     </a>
@@ -763,95 +445,160 @@
                 <div class="receipt">
                     <div class="summary">
                         <div class="amount">
-                            <h4>Total a pagar</h4>
-                            <h2>COP $122,000</h2>
-                            <div class="mobile-reference">TEST_20170419_132942</div>
+                            <div class="amount-required">
+                                <h4>Total a pagar</h4>
+                                <h2>COP $119,000</h2>
+                            </div>
+                            <div class="mobile-reference">TEST_20171207_150954</div>
                         </div>
                     </div>
                     <div class="details">
                         <div class="detail reference">
                             <span>Referencia</span>
-                            <strong>TEST_20170419_132942</strong>
+                            <strong>TEST_20171207_150954</strong>
                         </div>
                         <div class="detail description">
                             <span>Descripción</span>
-                            <strong>Numquam qui accusamus harum enim.</strong>
+                            <strong>Saepe maiores aut aut est eum minus.</strong>
                         </div>
                         <div class="detail date">
                             <span>Fecha</span>
-                            <strong>2017-04-19 08:30:43</strong>
+                            <strong>2017-12-07 15:10:24</strong>
                         </div>
                         <div class="detail session">
                             <span>Sesión</span>
-                            <strong>94</strong>
+                            <strong>117</strong>
                         </div>
                     </div>
+
+                    <div class="messages">
+
+
+                        <div class="contact message">
+                            Si lo requieres puedes contactarte con la empresa en el correo electrónico dcallem88@msn.com
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="branding">
+            <div class="container">
+                <div class="placetopay-logo">
+                    <img src="./index_files/placetopay.svg" alt="PlacetoPay">
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="w_modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Solo una cosa más, porque no conocemos este dispositivo</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Disculpa la molestia, pero por precaución necesitamos que nos proporciones el número que ha sido
+                        enviado a tu correo <strong>dcallem88@msn.com</strong>, de esta forma sabremos que tienes acceso
+                        a esta cuenta</p>
+                    <div class="form-group">
+                        <label for="w_otp">Número enviado</label>
+                        <input type="text" class="form-control validation" id="w_otp" name="w_otp"
+                               placeholder="Ingresa aquí el número">
+                        <p class="error">Es un número de 6 dígitos que se envió a tu correo</p>
+                    </div>
+
+                    <div class="wallet-otp selected">
+                        <div class="form-group group-checkbox">
+                            <label for="trust-device">
+                                <span>¿Este dispositivo es de confianza? Si lo es, asegurate de chequear esta opción para no molestarte con esto de nuevo</span>
+                                <i class="fa"></i>
+                                <input type="checkbox" id="trust-device" value="1">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="wallet-logo">
+                        <img src="./index_files/placetopay-wallet.svg"
+                             alt="PlacetoPay Wallet">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Listo! Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="./index_files/jquery-1.11.3.min.js"></script>
 <script>
     var p2p = {
+        "notify": null,
+        "actionable": true,
         "restrictPayer": false,
         "isSubscription": false,
         "isPartial": false,
-        "logoUrl": "https:\/\/static.placetopay.com\/admin\/images\/sites\/S-00000191\/logo.png",
+        "logoUrl": "./logo.png",
         "locale": "es_CO",
         "countryCode": "CO",
-        "merchantName": "EGM Demostraci\u00f3n - Comercio de Pruebas",
-        "hash": "6EpDft61LV8xqxJn",
+        "merchantName": "Oral Health - Pruebas",
+        "hash": "vuajqFmwYmn3rETt",
         "payer": {
-            "document": "1040035000",
-            "documentType": "CC",
-            "name": "Joanne",
-            "surname": "Gerlach",
-            "company": null,
+            "name": "Peggie",
+            "surname": "Schoen",
             "email": "dcallem88@msn.com",
-            "address": null,
+            "document": "104003500",
+            "documentType": "CC",
             "mobile": "3006108300"
         },
         "captureAddress": false,
-        "availableCardFranchises": ["amex", "diners", "visa", "master"],
-        "availableDebitFranchises": ["visa_electron"],
-        "expiration": "2019-04-19T08:49:42-05:00",
+        "availableFranchises": {
+            "card": ["visa"],
+            "debit": [],
+            "codensa": [],
+            "ris": [],
+            "diners": ["diners", "discover", "visa"]
+        },
+        "expiration": "2017-12-08T15:09:54-05:00",
+        "date": "2017-12-07T15:10:26-05:00",
+        "isFrame": false,
+        "businessDocumentTypes": ["NIT", "RUT", "RUC"],
         "session": {
-            "description": "Numquam qui accusamus harum enim.",
-            "reference": "TEST_20170419_132942",
+            "state": "created",
+            "description": "Saepe maiores aut aut est eum minus.",
+            "reference": "TEST_20171207_150954",
             "currency": "COP",
             "tax": 0,
             "discount": 0,
             "shipping": 0,
-            "subtotal": 122000,
-            "total": 122000,
-            "remaining": 122000,
+            "subtotal": 119000,
+            "total": 119000,
+            "remaining": 119000,
             "minPayment": 1000
         },
-        "routes": {
-            "visaDecrypt": "http:\/\/local.dev\/redirection\/vc\/decrypt\/94\/be21911aedb5e968c39d9c83c6a42c84",
-            "state": "http:\/\/local.dev\/redirection\/state\/94\/be21911aedb5e968c39d9c83c6a42c84",
-            "clientVerify": "http:\/\/local.dev\/redirection\/client\/verify",
-            "clientLogin": "http:\/\/local.dev\/redirection\/client\/login",
-            "process": "http:\/\/local.dev\/redirection\/payment\/94\/be21911aedb5e968c39d9c83c6a42c84",
-            "ganapin": "http:\/\/local.dev\/redirection\/gana\/assignpin\/94\/be21911aedb5e968c39d9c83c6a42c84",
-            "mpInquiry": "http:\/\/local.dev\/redirection\/mp\/inquiry\/94\/be21911aedb5e968c39d9c83c6a42c84",
-            "mpDecrypt": "http:\/\/local.dev\/redirection\/mp\/decrypt\/94\/be21911aedb5e968c39d9c83c6a42c84"
-        },
+        "routes": {},
         "lang": {
             "connectionError": "No hay conexi\u00f3n a internet desde este dispositivo, por favor verifica tu conectividad",
             "validationFailed": "Se han marcado de rojo los campos necesarios para continuar, por favor compl\u00e9telos",
-            "continueVc": "Continuar"
         },
-        "_token": "NDAAxPRENLgPM3XaKMDT2RqFw9lBpnwVqqO9BewF"
+        "_token": "Zq0VDPyrLRioRCgbmIhEaQRkQuFFIoTjDRxRpJCE",
+        "wallet": {
+            "id": 1,
+            "state": "registered",
+            "register": false,
+            "trustedDevice": true,
+            "method": null,
+            "authorized": false,
+            "methods": []
+        },
+        "services": ["diners", "card", "pse", "cash"]
     };
 </script>
 <script src="./index_files/vue.min.js"></script>
 <script src="./index_files/moment-locales.min.js"></script>
 <script src="./index_files/main.js"></script>
-
-
+<script src="https://use.fontawesome.com/b240f9a27d.js"></script>
 </body>
 </html>
