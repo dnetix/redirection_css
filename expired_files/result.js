@@ -137,12 +137,47 @@ function scrollTo(element){
     }, 500);
 }
 
+function sendFrameMessage(type, data) {
+    if (!data) {
+        data = {};
+    }
+    data.type = type;
+    parent.postMessage(JSON.stringify(data), '*');
+}
+
+function cancelPayment() {
+    location.href = p2p.routes.cancel;
+}
+
+function goBackMerchant() {
+    if(p2p.isFrame) {
+        var notify = p2p.notify;
+        sendFrameMessage('response', notify);
+        sendFrameMessage('close', {});
+        return true;
+    }
+    location.href = p2p.routes.merchant;
+}
+
+function cardEncode(number) {
+    if (number && number !== "") {
+        return btoa(number);
+    }
+    return null;
+}
+
+
 function calculateExpiration(app, p2p) {
     moment.locale(p2p.locale);
-    app.expiration = moment(p2p.expiration).fromNow();
 
-    if (p2p.routes && p2p.routes.state) {
-        var millisecondsToExpire = (moment(p2p.expiration) - moment()) + 2000;
+    var diff = moment() - moment(p2p.date);
+    var realNow = function() {
+        return moment().subtract(diff / 1000, 'seconds');
+    };
+    app.expiration = moment(p2p.expiration).from(realNow());
+
+    if (p2p.actionable) {
+        var millisecondsToExpire = (moment(p2p.expiration) - realNow()) + 2000;
         // Some devices fail when the expiration its too large
         if (millisecondsToExpire < 7200000) {
             setTimeout(function () {
@@ -152,7 +187,7 @@ function calculateExpiration(app, p2p) {
     }
 
     setInterval(function () {
-        app.expiration = moment(p2p.expiration).fromNow();
+        app.expiration = moment(p2p.expiration).from(realNow());
     }, 10000);
 }
 
@@ -164,11 +199,18 @@ var app = new Vue({
         processing: true
     },
     methods: {
+        cancelPayment: cancelPayment,
+        goBackMerchant: goBackMerchant
     },
     computed: {
     },
     ready: function () {
         this.processing = false;
+        if (p2p.session.state === 'pending') {
+            setTimeout(function () {
+                location.href = p2p.routes.state;
+            }, 60000);
+        }
         calculateExpiration(this, p2p);
     }
 });
